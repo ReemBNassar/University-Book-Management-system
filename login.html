@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniBook - Exchange Hub</title>
+    <title>UniBook - Engineering Gate</title>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -14,6 +14,7 @@
             --main-brown: #8b5e3c;
             --dark-brown: #643526;
             --light-beige: #f4f1ee;
+            --dark-espresso: #3c2a21;
         }
 
         body,
@@ -25,11 +26,28 @@
             overflow-x: hidden;
         }
 
-        .main-container {
-            height: 100vh;
-            display: flex;
+        .app-screen {
+            display: none;
+            min-height: 100vh;
             align-items: center;
             justify-content: center;
+            animation: fadeInScreen 0.5s ease-out both;
+        }
+
+        .app-screen.active-screen {
+            display: flex !important;
+        }
+
+        @keyframes fadeInScreen {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .slider-viewport {
@@ -156,7 +174,6 @@
             padding-right: 45px !important;
         }
 
-
         .lang-switcher {
             position: absolute;
             top: 20px;
@@ -219,6 +236,43 @@
             transform: translateX(950px);
         }
 
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(101, 67, 33, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .google-logo {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .spinner-container {
+            margin: 20px 0;
+        }
+
+        .spinner-border {
+            color: var(--main-brown);
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+
+        .success-card {
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(101, 67, 33, 0.1);
+            border: none;
+            background: white;
+            max-width: 450px;
+            width: 90%;
+        }
+
         @media (max-width: 768px) {
             .slider-viewport {
                 width: 100%;
@@ -251,7 +305,7 @@
 
 <body>
 
-    <div class="main-container">
+    <div class="app-screen active-screen" id="screenGate">
         <div class="slider-viewport">
 
             <div class="forgot-card" id="forgotCard">
@@ -264,7 +318,7 @@
                     <h2 id="forgotTitle" class="fw-bold mb-2">Reset Password</h2>
                     <p id="forgotSub" class="text-muted mb-4">Enter your details to secure your account.</p>
 
-                    <form action="javascript:void(0)" onclick="handleResetSubmit()">
+                    <form action="javascript:void(0)" onsubmit="handleResetSubmit()">
                         <div class="input-group-custom">
                             <i class="bi bi-card-text"></i>
                             <div class="form-floating">
@@ -338,7 +392,7 @@
                         </form>
 
                         <div class="divider" id="dividerText">OR</div>
-                        <button type="button" class="btn btn-google w-100 mb-4" onclick="location.href='google.html'">
+                        <button type="button" class="btn btn-google w-100 mb-4" onclick="triggerGoogleSync()">
                             <i class="bi bi-google me-2"></i> <span>Continue with Google</span>
                         </button>
                         <p class="text-center text-muted mb-0">
@@ -364,7 +418,7 @@
                         <h2 id="signupTitle" class="fw-bold mb-2">Create Account</h2>
                         <p id="signupSub" class="text-muted mb-4">Join our engineering community!</p>
 
-                        <form action="success.html">
+                        <form action="javascript:void(0)" onsubmit="triggerSuccessScreen()">
                             <div class="input-group-custom">
                                 <i class="bi bi-person"></i>
                                 <div class="form-floating">
@@ -416,6 +470,36 @@
         </div>
     </div>
 
+
+    <div class="app-screen" id="screenGoogleLoader">
+        <div class="auth-card">
+            <div class="google-logo">
+                <i class="bi bi-google" style="color: #8b5e3c;"></i>
+            </div>
+            <div class="spinner-container">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div class="status-msg" id="statusText">Connecting to Google...</div>
+            <div class="user-hint" id="googleHint">Please wait while we sync your UniBook account.</div>
+        </div>
+    </div>
+
+
+    <div class="app-screen" id="screenSuccess">
+        <div class="success-card">
+            <div class="mb-3 text-success">
+                <i class="bi bi-check-circle-fill" style="font-size: 3.5rem; color: var(--main-brown);"></i>
+            </div>
+            <h1 class="fw-bold h3 mb-2" id="successHeader">Account created successfully</h1>
+            <p class="text-muted mb-4" id="successSub">Welcome engineer in UniBook</p>
+            <button onclick="backFromSuccessToLogin()" class="btn btn-brown px-4 py-2" id="btnBackSuccess">Back to
+                login</button>
+        </div>
+    </div>
+
+
     <script>
         const wrapper = document.getElementById('sliderWrapper');
         const forgotCard = document.getElementById('forgotCard');
@@ -440,6 +524,58 @@
         function hideForgot() {
             forgotCard.classList.remove('forgot-active');
             wrapper.style.opacity = '1';
+        }
+        function handleLogin(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('email').value.trim().toLowerCase();
+
+            if (emailInput === 'admin@unibook.com' || emailInput.startsWith('admin')) {
+                window.location.href = 'admin_dashboard.html';
+            } else {
+                window.location.href = 'student.html';
+            }
+        }
+
+        function triggerGoogleSync() {
+            document.getElementById('screenGate').classList.remove('active-screen');
+            document.getElementById('screenGoogleLoader').classList.add('active-screen');
+
+            const status = document.getElementById('statusText');
+            const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+
+            setTimeout(() => {
+                status.innerText = lang === 'ar' ? "جاري التحقق من الهوية..." : "Verifying Credentials...";
+                setTimeout(() => {
+                    status.innerText = lang === 'ar' ? "جاري التوجيه للبوابة..." : "Redirecting to Hub...";
+                    setTimeout(() => {
+                        window.location.href = "student.html";
+                    }, 1000);
+                }, 1200);
+            }, 1200);
+        }
+        function triggerSuccessScreen() {
+            document.getElementById('screenGate').classList.remove('active-screen');
+            document.getElementById('screenSuccess').classList.add('active-screen');
+        }
+
+        function backFromSuccessToLogin() {
+            document.getElementById('screenSuccess').classList.remove('active-screen');
+            document.getElementById('screenGate').classList.add('active-screen');
+            goToLogin();
+        }
+
+        function handleResetSubmit() {
+            const email = document.getElementById('emailForgot').value;
+            const statusText = document.getElementById('forgotSub');
+            const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+
+            statusText.innerText = lang === 'ar' ? "جاري مطابقة البيانات..." : "Verifying ID & Email...";
+            statusText.style.color = "var(--main-brown)";
+
+            setTimeout(() => {
+                statusText.innerText = lang === 'ar' ? "تم إرسال رابط التعيين إلى " + email : "A reset link has been sent to " + email;
+                statusText.style.color = "green";
+            }, 1500);
         }
 
         function toggleLanguage() {
@@ -466,27 +602,6 @@
             }, 400);
         }
 
-        function handleResetSubmit() {
-            const email = document.getElementById('emailForgot').value;
-            const statusText = document.getElementById('forgotSub');
-            statusText.innerText = "Verifying ID & Email...";
-            statusText.style.color = "var(--main-brown)";
-
-            setTimeout(() => {
-                statusText.innerText = "A reset link has been sent to " + email;
-                statusText.style.color = "green";
-            }, 1500);
-        }
-        function handleLogin(e) {
-            e.preventDefault();
-
-            const emailInput = document.getElementById('email').value.trim().toLowerCase();
-            if (emailInput === 'admin@unibook.com' || emailInput.startsWith('admin')) {
-                window.location.href = 'home.html';
-            } else {
-                window.location.href = 'student.html';
-            }
-        }
         function updateTexts(lang) {
             const texts = {
                 ar: {
@@ -504,7 +619,10 @@
                     idLabelSignup: 'الرقم الجامعي',
                     forgotTitle: 'استعادة كلمة المرور', forgotSub: 'أدخل بياناتك الجامعية لتأمين حسابك.',
                     idLabelForgot: 'الرقم الجامعي', emailForgotLabel: 'البريد الجامعي',
-                    resetBtn: 'إرسال رابط التعيين', backToSignIn: 'العودة لتسجيل الدخول'
+                    resetBtn: 'إرسال رابط التعيين', backToSignIn: 'العودة لتسجيل الدخول',
+                    statusText: 'جاري الاتصال بغوغل...', googleHint: 'يرجى الانتظار بينما نقوم بمزامنة حساب UniBook الخاص بك.',
+                    successHeader: 'تم إنشاء الحساب بنجاح!', successSub: 'مرحباً بك كمهندس فاعل في عائلة UniBook.',
+                    btnBackSuccess: 'العودة لتسجيل الدخول'
                 },
                 en: {
                     loginTitle: 'Sign In', loginSub: 'Welcome, Engineer!',
@@ -521,7 +639,10 @@
                     idLabelSignup: 'Student ID',
                     forgotTitle: 'Reset Password', forgotSub: 'Enter your details to secure your account.',
                     idLabelForgot: 'Student ID', emailForgotLabel: 'Student Email',
-                    resetBtn: 'Send Reset Link', backToSignIn: 'Back to Sign In'
+                    resetBtn: 'Send Reset Link', backToSignIn: 'Back to Sign In',
+                    statusText: 'Connecting to Google...', googleHint: 'Please wait while we sync your UniBook account.',
+                    successHeader: 'Account created successfully', successSub: 'Welcome engineer in UniBook',
+                    btnBackSuccess: 'Back to login'
                 }
             };
 
@@ -535,11 +656,13 @@
             document.querySelectorAll('.brandDesc').forEach(el => el.innerText = texts[lang].brandDesc);
 
             const switchers = document.querySelectorAll('.lang-switcher');
-            if (lang === 'ar') {
-                switchers.forEach(s => { s.style.right = 'auto'; s.style.left = '20px'; });
-            } else {
-                switchers.forEach(s => { s.style.left = 'auto'; s.style.right = '20px'; });
-            }
+            switchers.forEach(s => {
+                if (lang === 'ar') {
+                    s.style.right = 'auto'; s.style.left = '20px';
+                } else {
+                    s.style.left = 'auto'; s.style.right = '20px';
+                }
+            });
         }
     </script>
 </body>
