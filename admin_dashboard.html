@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniBook - لوحة المشرف</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --main-brown: #8b5e3c; --dark-brown: #643526; --light-beige: #f4f1ee; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-beige); }
+        .navbar-custom { background: var(--dark-brown); }
+        .navbar-custom .navbar-brand { color: #fff !important; }
+        .btn-brown { background: var(--main-brown); color: #fff; border: none; }
+        .btn-brown:hover { background: var(--dark-brown); color: #fff; }
+        .card-stat { background: #fff; border-radius: 14px; box-shadow: 0 4px 14px rgba(101,67,33,.08); padding: 18px; text-align: center; }
+        .card-stat .num { font-size: 2rem; font-weight: 800; color: var(--main-brown); }
+        .section-title { color: var(--dark-brown); font-weight: 700; }
+        .panel { background: #fff; border-radius: 14px; box-shadow: 0 4px 14px rgba(101,67,33,.08); padding: 20px; margin-bottom: 24px; }
+        .tab-btn.active { background: var(--main-brown); color: #fff; }
+        .tab-btn { border: 1px solid var(--main-brown); color: var(--main-brown); background: #fff; }
+        table { font-size: .92rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-custom mb-4">
+    <div class="container">
+        <span class="navbar-brand fw-bold"><i class="bi bi-shield-lock"></i> UniBook — لوحة المشرف</span>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-white">مرحبًا، <span id="adminName">...</span></span>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()">خروج</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+
+    <!-- إحصائيات -->
+    <div class="row g-3 mb-4" id="statsRow"></div>
+
+    <!-- تبويبات -->
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+        <button class="btn tab-btn active" data-tab="requests" onclick="showTab('requests')"><i class="bi bi-inbox"></i> الطلبات</button>
+        <button class="btn tab-btn" data-tab="books" onclick="showTab('books')"><i class="bi bi-book"></i> الكتب</button>
+        <button class="btn tab-btn" data-tab="reports" onclick="showTab('reports')"><i class="bi bi-bar-chart"></i> التقارير</button>
+    </div>
+
+    <!-- الطلبات -->
+    <div id="tab-requests">
+        <div class="panel">
+            <div class="d-flex justify-content-between mb-3">
+                <h5 class="section-title mb-0">طلبات الاستعارة</h5>
+                <select id="reqFilter" class="form-select w-auto" onchange="loadRequests()">
+                    <option value="">الكل</option>
+                    <option value="Pending">قيد المراجعة</option>
+                    <option value="Approved">تمت الموافقة</option>
+                    <option value="Rejected">مرفوض</option>
+                    <option value="Returned">تم الإرجاع</option>
+                </select>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>الطالب</th><th>الكتاب</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead>
+                    <tbody id="reqBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- الكتب -->
+    <div id="tab-books" style="display:none">
+        <div class="panel">
+            <h5 class="section-title mb-3">إضافة كتاب جديد</h5>
+            <div class="row g-2">
+                <div class="col-md-4"><input id="bTitle" class="form-control" placeholder="العنوان"></div>
+                <div class="col-md-3"><input id="bAuthor" class="form-control" placeholder="المؤلف"></div>
+                <div class="col-md-3">
+                    <select id="bDept" class="form-select">
+                        <option value="">القسم</option>
+                        <option>Computer Engineering</option>
+                        <option>Electrical Engineering</option>
+                        <option>Mechanical Engineering</option>
+                        <option>Civil Engineering</option>
+                        <option>General</option>
+                    </select>
+                </div>
+                <div class="col-md-2"><button class="btn btn-brown w-100" onclick="addBook()">إضافة</button></div>
+            </div>
+        </div>
+        <div class="panel">
+            <h5 class="section-title mb-3">كل الكتب</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>العنوان</th><th>المؤلف</th><th>القسم</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                    <tbody id="booksBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- التقارير -->
+    <div id="tab-reports" style="display:none">
+        <div class="panel">
+            <h5 class="section-title mb-3">الكتب الأكثر استعارة</h5>
+            <div id="mostBorrowed"></div>
+        </div>
+        <div class="panel">
+            <h5 class="section-title mb-3">أطول قوائم الانتظار</h5>
+            <div id="longWaitlists"></div>
+        </div>
+    </div>
+
+</div>
+
+<script src="api/api.js"></script>
+<script>
+    async function init() {
+        const me = await apiGet('me.php');
+        if (!me.success) { window.location.href = 'login.html'; return; }
+        if (me.user.role !== 'Admin') { window.location.href = 'student.html'; return; }
+        document.getElementById('adminName').innerText = me.user.full_name;
+        loadStats();
+        loadRequests();
+    }
+
+    function showTab(tab) {
+        ['requests','books','reports'].forEach(t => document.getElementById('tab-' + t).style.display = (t===tab)?'block':'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        if (tab === 'books') loadBooks();
+        if (tab === 'reports') loadReports();
+        if (tab === 'requests') loadRequests();
+    }
+
+    // ===== إحصائيات =====
+    async function loadStats() {
+        const res = await apiGet('reports.php');
+        if (!res.success) return;
+        const s = res.stats;
+        const items = [
+            ['إجمالي الكتب', s.total_books], ['المتاحة', s.available_books],
+            ['المُعارة', s.borrowed_books], ['الطلاب', s.total_students],
+            ['طلبات معلّقة', s.pending_requests]
+        ];
+        document.getElementById('statsRow').innerHTML = items.map(([l,v]) =>
+            `<div class="col"><div class="card-stat"><div class="num">${v}</div><div class="text-muted small">${l}</div></div></div>`).join('');
+    }
+
+    // ===== الطلبات =====
+    async function loadRequests() {
+        const f = document.getElementById('reqFilter').value;
+        const res = await apiGet('requests_all.php' + (f ? '?status=' + f : ''));
+        const stMap = { Pending:'قيد المراجعة', Approved:'تمت الموافقة', Rejected:'مرفوض', Returned:'تم الإرجاع' };
+        const body = document.getElementById('reqBody');
+        if (!res.requests || !res.requests.length) { body.innerHTML = '<tr><td colspan="5" class="text-muted text-center">لا توجد طلبات</td></tr>'; return; }
+        body.innerHTML = res.requests.map(r => {
+            let actions = '';
+            if (r.status === 'Pending') {
+                actions = `<button class="btn btn-success btn-sm me-1" onclick="decide(${r.request_id},'approve')">موافقة</button>
+                           <button class="btn btn-danger btn-sm" onclick="decide(${r.request_id},'reject')">رفض</button>`;
+            } else if (r.status === 'Approved') {
+                actions = `<button class="btn btn-brown btn-sm" onclick="decide(${r.request_id},'return')">تأكيد الإرجاع</button>`;
+            } else { actions = '<span class="text-muted">—</span>'; }
+            return `<tr>
+                <td>${escapeHtml(r.student_name)}<br><small class="text-muted">${escapeHtml(r.student_email)}</small></td>
+                <td>${escapeHtml(r.title)}</td>
+                <td><small>${new Date(r.request_date).toLocaleDateString('ar-EG')}</small></td>
+                <td>${stMap[r.status] || r.status}</td>
+                <td>${actions}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    async function decide(id, action) {
+        let payload = { request_id: id, action };
+        if (action === 'reject') { const reason = prompt('سبب الرفض (اختياري):'); if (reason !== null) payload.reason = reason; }
+        const res = await apiPost('request_decide.php', payload);
+        alert(res.message);
+        loadRequests(); loadStats();
+    }
+
+    // ===== الكتب =====
+    async function loadBooks() {
+        const res = await apiGet('books.php');
+        const stMap = { Available:'متاح', Borrowed:'مُعار', Damaged:'تالف' };
+        const body = document.getElementById('booksBody');
+        if (!res.books || !res.books.length) { body.innerHTML = '<tr><td colspan="5" class="text-muted text-center">لا توجد كتب</td></tr>'; return; }
+        body.innerHTML = res.books.map(b => `
+            <tr>
+                <td>${escapeHtml(b.title)}</td>
+                <td>${escapeHtml(b.author)}</td>
+                <td>${escapeHtml(b.department || '')}</td>
+                <td>${stMap[b.status] || b.status}</td>
+                <td>
+                    <button class="btn btn-outline-secondary btn-sm me-1" onclick="markDamaged(${b.book_id})" title="تعليم كتالف"><i class="bi bi-exclamation-triangle"></i></button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="delBook(${b.book_id})" title="حذف"><i class="bi bi-trash"></i></button>
+                </td>
+            </tr>`).join('');
+    }
+
+    async function addBook() {
+        const title = document.getElementById('bTitle').value.trim();
+        const author = document.getElementById('bAuthor').value.trim();
+        const department = document.getElementById('bDept').value;
+        if (!title || !author) { alert('العنوان والمؤلف مطلوبان'); return; }
+        const res = await apiPost('book_add.php', { title, author, department });
+        alert(res.message);
+        if (res.success) { document.getElementById('bTitle').value=''; document.getElementById('bAuthor').value=''; loadBooks(); loadStats(); }
+    }
+
+    async function markDamaged(id) {
+        if (!confirm('تعليم الكتاب كتالف؟')) return;
+        const res = await apiPost('book_update_status.php', { book_id: id, status: 'Damaged' });
+        alert(res.message); loadBooks();
+    }
+
+    async function delBook(id) {
+        if (!confirm('حذف الكتاب نهائيًا؟')) return;
+        const res = await apiPost('book_delete.php', { book_id: id });
+        alert(res.message); loadBooks(); loadStats();
+    }
+
+    // ===== التقارير =====
+    async function loadReports() {
+        const res = await apiGet('reports.php');
+        if (!res.success) return;
+        const mb = res.most_borrowed || [];
+        document.getElementById('mostBorrowed').innerHTML = mb.length ? `
+            <table class="table table-sm"><thead><tr><th>الكتاب</th><th>القسم</th><th>عدد مرات الاستعارة</th></tr></thead>
+            <tbody>${mb.map(b => `<tr><td>${escapeHtml(b.title)}</td><td>${escapeHtml(b.department||'')}</td><td><strong>${b.borrow_count}</strong></td></tr>`).join('')}</tbody></table>`
+            : '<p class="text-muted">لا توجد بيانات بعد.</p>';
+        const lw = res.long_waitlists || [];
+        document.getElementById('longWaitlists').innerHTML = lw.length ? `
+            <table class="table table-sm"><thead><tr><th>الكتاب</th><th>عدد المنتظرين</th></tr></thead>
+            <tbody>${lw.map(b => `<tr><td>${escapeHtml(b.title)}</td><td><strong>${b.waiting}</strong></td></tr>`).join('')}</tbody></table>`
+            : '<p class="text-muted">لا توجد قوائم انتظار حاليًا.</p>';
+    }
+
+    async function logout() { await apiPost('logout.php', {}); window.location.href = 'login.html'; }
+    function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    init();
+</script>
+</body>
+</html>
