@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniBook - Admin Premium Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --dark-espresso: #3c2a21;
+            --warm-chocolate: #5c4033;
+            --classic-tan: #8b5e3c;
+            --creamy-beige: #fdfbf7;
+            --pure-white: #ffffff;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f2eb 0%, #e8e3d7 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: calc(100vh - 40px);
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--dark-espresso);
+            color: white;
+            border-radius: 24px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 15px 35px rgba(60, 42, 33, 0.2);
+            z-index: 100;
+            transition: all 0.5s ease;
+        }
+
+        .sidebar .brand {
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 30px;
+            flex-grow: 1;
+        }
+
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 14px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: var(--classic-tan);
+            color: var(--pure-white);
+            transform: translateX(5px);
+            box-shadow: 0 8px 20px rgba(139, 94, 60, 0.3);
+        }
+
+        .sidebar .btn-logout {
+            background-color: rgba(211, 47, 47, 0.1);
+            color: #ef5350;
+            border: 1px solid rgba(211, 47, 47, 0.2);
+        }
+
+        .sidebar .btn-logout:hover {
+            background-color: #d32f2f;
+            color: white;
+            transform: none;
+            box-shadow: 0 8px 20px rgba(211, 47, 47, 0.3);
+        }
+
+        .main-content {
+            margin-left: calc(var(--sidebar-width) + 40px);
+            padding: 20px 40px 40px 20px;
+            min-height: 100vh;
+            transition: all 0.5s ease;
+        }
+
+        .top-navbar {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 15px 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 32px rgba(60, 42, 33, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-profile-zone {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-bell {
+            position: relative;
+            font-size: 1.3rem;
+            color: var(--warm-chocolate);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .notification-bell:hover {
+            color: var(--classic-tan);
+        }
+
+        .notification-bell .badge-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ef5350;
+            border-radius: 50%;
+        }
+
+        .notification-bell .dropdown-menu {
+            background-color: var(--creamy-beige);
+            border: 1px solid rgba(139, 94, 60, 0.15) !important;
+            box-shadow: 0 10px 30px rgba(60, 42, 33, 0.1) !important;
+        }
+
+        .notification-bell.dropdown-toggle::after {
+            display: none !important;
+        }
+
+        .admin-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background-color: var(--classic-tan);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(139, 94, 60, 0.2);
+        }
+
+        .premium-card {
+            background: rgba(255, 255, 255, 0.85);
+
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(60, 42, 33, 0.03);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .premium-card:hover {
+            box-shadow: 0 16px 35px rgba(60, 42, 33, 0.08);
+            background: var(--pure-white);
+        }
+
+        .btn-brown {
+            background-color: var(--classic-tan);
+            color: white;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-brown:hover {
+            background-color: var(--warm-chocolate);
+            color: white;
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .book-avatar {
+            width: 60px;
+            height: 75px;
+            background: #fdfbf7;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--classic-tan);
+            border: 1px dashed rgba(139, 94, 60, 0.3);
+        }
+
+        .student-avatar {
+            width: 48px;
+            height: 48px;
+            background: #e0f2fe;
+            color: #0284c7;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .btn-action-round {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-action-round:hover {
+            transform: scale(1.08);
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
+        .fade-section {
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .table-premium {
+            background: transparent;
+        }
+
+        .table-premium th {
+            background-color: var(--dark-espresso) !important;
+            color: white !important;
+            border: none;
+            padding: 15px;
+        }
+
+        .table-premium td {
+            padding: 15px;
+            vertical-align: middle;
+            background: transparent !important;
+        }
+
+        [lang="ar"] .sidebar {
+            left: auto;
+            right: 20px;
+        }
+
+        [lang="ar"] .main-content {
+            margin-left: 20px;
+            margin-right: calc(var(--sidebar-width) + 40px);
+            padding: 20px 20px 40px 40px;
+        }
+
+        [lang="ar"] .sidebar a:hover,
+        [lang="ar"] .sidebar a.active {
+            transform: translateX(-5px);
+        }
+
+        [lang="ar"] .text-end-rtl {
+            text-align: left !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="brand">
+                <h4 class="fw-bold text-white mb-1">UniBook Hub</h4>
+                <span class="badge" id="sidebarBadge" style="background-color: var(--classic-tan);">Engineering
+                    Panel</span>
+            </div>
+
+            <div class="nav-links">
+                <a id="navRequests" onclick="switchDashboard('requests')" class="active">
+                    <i class="bi bi-chat-square-quote"></i> <span id="lblNavRequests">Incoming Requests</span>
+                </a>
+                <a id="navLibrary" onclick="switchDashboard('library')">
+                    <i class="bi bi-collection"></i> <span id="lblNavLibrary">Active Library</span>
+                </a>
+                <a id="navStudents" onclick="switchDashboard('students')">
+                    <i class="bi bi-people"></i> <span id="lblNavStudents">Students Directory</span>
+                </a>
+                <a id="navSettings" onclick="switchDashboard('settings')">
+                    <i class="bi bi-sliders"></i> <span id="lblNavSettings">Update Password</span>
+                </a>
+                <a id="navNotifications" onclick="switchDashboard('notifications')">
+                    <i class="bi bi-bell"></i> <span id="lblNavNotifications">Notifications</span>
+                </a>
+            </div>
+        </div>
+
+        <a onclick="handleLogout()" class="btn-logout text-center justify-content-center">
+            <i class="bi bi-box-arrow-left"></i> <span id="lblLogout">Log Out</span>
+        </a>
+    </div>
+
+    <div class="main-content fade-section" id="mainContentZone">
+        <div class="container-fluid p-0">
+
+            <div class="top-navbar">
+                <div>
+                    <h4 class="fw-bold text-dark mb-0" id="sectionHeaderTitle">Incoming Requests</h4>
+                    <small class="text-muted" id="sectionHeaderSub">Direct tickets and book submissions sent by
+                        students.</small>
+                </div>
+                <div class="user-profile-zone" style="position: relative; z-index: 9999;">
+                    <button class="btn btn-sm btn-outline-secondary px-3 rounded-pill" id="langToggleBtn"
+                        onclick="toggleDashboardLanguage()">العربية</button>
+
+                    <div class="dropdown">
+                        <div class="notification-bell dropdown-toggle" id="adminNotifBell" data-bs-toggle="dropdown"
+                            aria-expanded="false" style="position: relative;">
+                            <i class="bi bi-bell"></i>
+                            <div class="badge-dot d-none" id="adminNotifBadge"></div>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end p-3 shadow-lg border-0 rounded-4"
+                            aria-labelledby="adminNotifBell"
+                            style="width: 320px; max-height: 400px; overflow-y: auto; z-index: 1000000000000000000000 !important;">
+
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                <span class="fw-bold text-dark" id="lblAdminNotifTitle">Notifications</span>
+                                <button class="btn btn-sm btn-link text-decoration-none p-0" id="btnAdminNotifClear"
+                                    style="color: var(--classic-tan); font-size: 0.85rem;"
+                                    onclick="clearAdminNotifications(event)">Mark all as read</button>
+                            </div>
+                            <div id="adminNotifContainer">
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+                <div class="d-none d-sm-block text-end text-end-rtl">
+                    <div class="fw-bold text-dark" id="topNavAdminName" style="font-size: 0.95rem;">Engineering Club
+                        Admin</div>
+                    <small class="text-muted" id="topNavAdminRole" style="font-size: 0.8rem;">engClub@gmail.com</small>
+                </div>
+                <div class="admin-avatar">EC</div>
+            </div>
+        </div>
+
+        <div id="sectionRequests">
+            <div id="requestsContainer"></div>
+        </div>
+
+        <div id="sectionLibrary" class="d-none">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                <h5 class="fw-bold text-dark mb-0" id="lblTotalBooks">Total Books: 0</h5>
+                <div class="d-flex flex-wrap gap-2" id="adminDeptFilterPills">
+
+                </div>
+                <button class="btn btn-brown rounded-3 px-3 py-2" data-bs-toggle="modal" data-bs-target="#addBookModal"
+                    id="btnAddNewBook">
+                    <i class="bi bi-plus-circle me-1"></i> Add New Book
+                </button>
+            </div>
+            <div id="dynamicLibraryContainer"></div>
+        </div>
+
+        <div id="sectionStudents" class="d-none">
+            <div class="premium-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover table-premium mb-0">
+                        <thead>
+                            <tr>
+                                <th id="thStudent">Student</th>
+                                <th id="thID">Student ID</th>
+                                <th id="thDept">Department</th>
+                                <th id="thStatus">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblStudentsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="sectionSettings" class="d-none">
+            <div class="premium-card p-4">
+                <h5 class="fw-bold text-dark mb-4"><i class="bi bi-lock-fill me-2 text-brown"></i> <span
+                        id="lblSetMainTitle">Update Admin Password</span></h5>
+
+                <div id="passwordAlert" class="alert d-none mb-3" role="alert"></div>
+
+                <form id="frmUpdatePassword" onsubmit="handlePasswordUpdate(event)">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-muted" id="lblCurrentPassword">Current
+                                Password</label>
+                            <input type="password" id="txtCurrentPass" class="form-control p-3 rounded-3" required
+                                style="background-color: var(--creamy-beige); border: 1px solid #e0dcd3;">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-muted" id="lblNewPassword">New
+                                Password</label>
+                            <input type="password" id="txtNewPass" class="form-control p-3 rounded-3" required
+                                style="background-color: var(--creamy-beige); border: 1px solid #e0dcd3;">
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-brown px-4 py-2 rounded-3" id="btnSetSave">Update
+                                Password</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="sectionNotifications" class="d-none">
+            <div class="premium-card p-4">
+                <h5 class="fw-bold text-dark mb-4"><i class="bi bi-bell-fill me-2 text-brown"></i> <span
+                        id="lblNotificationsTitleAdmin">Notifications</span></h5>
+                <div id="divAdminPageNotifications">
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    <div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header text-white rounded-top-4" style="background-color: var(--dark-espresso);">
+                    <h5 class="modal-title fw-bold" id="modalAddTitle">Add New Book to Hub</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-shadow="none"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    <form id="frmAddBook">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted" id="lblMdlTitle">Book Title</label>
+                            <input type="text" id="bookTitle" class="form-control border-0 p-2 rounded-3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted" id="lblMdlAuthor">Author</label>
+                            <input type="text" id="bookAuthor" class="form-control border-0 p-2 rounded-3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted" id="lblMdlDept">Department</label>
+                            <select id="bookDept" class="form-select border-0 p-2 rounded-3">
+                                <option>Computer Engineering</option>
+                                <option>Electrical Engineering</option>
+                                <option>Civil Engineering</option>
+                                <option>Mechanical Engineering</option>
+                                <option>Architecture Engineering</option>
+                                <option>Smart Systems Engineering</option>
+                                <option>Industrial engineering</option>
+                                <option>Environmental engineering</option>
+                                <option>Artificial Intelligence Engineering</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-brown w-100 p-2 rounded-3 mt-2" id="btnMdlSubmit">Publish
+                            Book</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-body p-4 text-center">
+                    <i class="bi bi-exclamation-triangle text-danger display-5 mb-2"></i>
+                    <h6 class="fw-bold text-dark" id="lblRejectTitle">Reason for Rejection</h6>
+                    <textarea class="form-control rounded-3 border-1 mb-3" rows="3" id="txtRejectReason"
+                        placeholder="e.g., student has too many overdue books..."></textarea>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary btn-sm w-50" data-bs-dismiss="modal"
+                            id="btnRejectCancel">Cancel</button>
+                        <button type="button" class="btn btn-danger btn-sm w-50" id="btnRejectConfirm">Reject</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const currentRole = 'Admin';
+        function fetchAPI(url, options = {}) {
+            let separator = url.includes('?') ? '&' : '?';
+            let targetUrl = url;
+
+            const userStr = localStorage.getItem('user');
+            const expectedUserId = userStr ? JSON.parse(userStr).user_id : '';
+
+            if (!url.includes('expected_role=')) {
+                targetUrl = url + separator + 'expected_role=' + currentRole;
+                separator = '&';
+            }
+            if (expectedUserId && !url.includes('expected_user_id=')) {
+                targetUrl = targetUrl + separator + 'expected_user_id=' + expectedUserId;
+            }
+
+            return window.fetch(targetUrl, options)
+                .then(res => {
+                    if (res.status === 401) {
+                        localStorage.clear();
+                        window.location.href = "login.html";
+                        throw new Error("Unauthorized");
+                    }
+                    return res;
+                });
+        }
+
+        let currentSection = localStorage.getItem('currentAdminSection') || 'requests';
+        let currentBooks = [];
+        let activeRejectRequestId = null;
+
+        const sectionsData = {
+            en: {
+                requests: { title: 'Incoming Requests', sub: 'Direct tickets and book submissions sent by students.' },
+                library: { title: 'Active Library', sub: 'Monitor and manage books currently listed on the UniBook platform.' },
+                students: { title: 'Students Directory', sub: 'Manage registered students and their platform access.' },
+                settings: { title: 'Update Password', sub: 'Securely update the password for engClub@gmail.com account.' },
+                notifications: { title: 'Admin Notifications', sub: 'Recent alerts and request history notifications.' }
+            },
+            ar: {
+                requests: { title: 'الطلبات الواردة', sub: 'البلاغات المباشرة وطلبات الكتب المرسلة من الطلاب.' },
+                library: { title: 'المكتبة النشطة', sub: 'مراقبة وإدارة الكتب المعروضة حالياً على منصة الكتب الجامعية.' },
+                students: { title: 'دليل الطلاب', sub: 'إدارة الطلاب المسجلين والتحكم بصلاحيات دخولهم للمنصة.' },
+                settings: { title: 'تحديث كلمة المرور', sub: 'تحديث كلمة المرور الخاصة بحساب الإدارة engClub@gmail.com بأمان.' },
+                notifications: { title: 'إشعارات الإدارة', sub: 'التنبيهات الأخيرة وسجل تاريخ الإشعارات.' }
+            }
+        };
+
+        function checkAuth() {
+            const isAdmin = localStorage.getItem('isAdminLoggedIn');
+            if (isAdmin !== 'true') {
+                window.location.href = "login.html";
+                return;
+            }
+
+            fetchAPI('profile.php')
+                .then(res => {
+                    if (res.status === 401) {
+                        window.location.href = "login.html";
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success && data.profile.role === 'Admin') {
+                        document.getElementById('topNavAdminName').innerText = data.profile.full_name;
+                        document.getElementById('topNavAdminRole').innerText = data.profile.email;
+
+
+                        switchDashboard(currentSection);
+                        loadAdminNotifications();
+                    } else {
+                        window.location.href = "login.html";
+                    }
+                })
+                .catch(err => {
+                    console.error("Auth error:", err);
+                    const userStr = localStorage.getItem('user');
+                    if (userStr) {
+                        const user = JSON.parse(userStr);
+                        document.getElementById('topNavAdminName').innerText = user.full_name;
+                        document.getElementById('topNavAdminRole').innerText = user.email;
+                        switchDashboard(currentSection);
+                        loadAdminNotifications();
+                    } else {
+                        window.location.href = "login.html";
+                    }
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            checkAuth();
+
+            document.getElementById('btnRejectConfirm').addEventListener('click', function () {
+                if (activeRejectRequestId) {
+                    const reason = document.getElementById('txtRejectReason').value.trim();
+                    updateRequestStatus(activeRejectRequestId, 'Rejected', reason);
+                    const modalEl = document.getElementById('rejectReasonModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                    activeRejectRequestId = null;
+                    document.getElementById('txtRejectReason').value = '';
+                }
+            });
+
+            setInterval(loadAdminNotifications, 10000);
+
+            const notifBell = document.getElementById('adminNotifBell');
+            if (notifBell) {
+                notifBell.addEventListener('show.bs.dropdown', function () {
+                    clearAdminNotifications();
+                });
+            }
+        });
+
+        function switchDashboard(targetSection) {
+            currentSection = targetSection;
+            localStorage.setItem('currentAdminSection', targetSection);
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+
+            const keys = ['requests', 'library', 'students', 'settings', 'notifications'];
+            keys.forEach(key => {
+                document.getElementById('section' + key.charAt(0).toUpperCase() + key.slice(1)).classList.add('d-none');
+                document.getElementById('nav' + key.charAt(0).toUpperCase() + key.slice(1)).classList.remove('active');
+            });
+
+            document.getElementById('section' + targetSection.charAt(0).toUpperCase() + targetSection.slice(1)).classList.remove('d-none');
+            document.getElementById('nav' + targetSection.charAt(0).toUpperCase() + targetSection.slice(1)).classList.add('active');
+
+            document.getElementById('sectionHeaderTitle').innerText = sectionsData[currentLang][targetSection].title;
+            document.getElementById('sectionHeaderSub').innerText = sectionsData[currentLang][targetSection].sub;
+
+            if (targetSection === 'library') {
+                displayLibraryBooks();
+                renderAdminDepartmentFilters();
+            }
+            if (targetSection === 'requests') loadRequests();
+            if (targetSection === 'students') loadStudents();
+            if (targetSection === 'notifications') loadAdminNotifications();
+        }
+
+        function handlePasswordUpdate(event) {
+            event.preventDefault();
+            const newPassInput = document.getElementById('txtNewPass').value;
+            const alertBox = document.getElementById('passwordAlert');
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+
+            alertBox.classList.add('d-none');
+            alertBox.className = "alert mb-3";
+
+            fetchAPI('profile.php', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: newPassInput })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alertBox.classList.remove('d-none');
+                        alertBox.classList.add('alert-success');
+                        alertBox.innerText = currentLang === 'ar' ? 'تم تحديث كلمة المرور بنجاح!' : 'Password updated successfully!';
+                        document.getElementById('frmUpdatePassword').reset();
+                    } else {
+                        alertBox.classList.remove('d-none');
+                        alertBox.classList.add('alert-danger');
+                        alertBox.innerText = data.message;
+                    }
+                })
+                .catch(err => {
+                    console.error("Error updating password:", err);
+                    alertBox.classList.remove('d-none');
+                    alertBox.classList.add('alert-danger');
+                    alertBox.innerText = currentLang === 'ar' ? 'حدث خطأ أثناء تحديث كلمة المرور' : 'Error updating password';
+                });
+        }
+
+        function handleLogout() {
+            fetchAPI('logout.php')
+                .then(() => {
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                })
+                .catch(() => {
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                });
+        }
+
+        function handleAddBook(e) {
+            e.preventDefault();
+
+            const bookTitle = document.getElementById('bookTitle').value.trim();
+            const bookAuthor = document.getElementById('bookAuthor').value.trim();
+            const bookDept = document.getElementById('bookDept').value;
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+
+            if (!bookTitle || !bookAuthor) {
+                alert(currentLang === 'ar' ? "يرجى ملء جميع الحقول المطلوبة!" : "Please fill all required fields!");
+                return;
+            }
+
+            fetchAPI('books.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: bookTitle,
+                    author: bookAuthor,
+                    department: bookDept
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const modalElement = document.getElementById('addBookModal');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        if (modalInstance) modalInstance.hide();
+
+                        document.getElementById('frmAddBook').reset();
+
+                        displayLibraryBooks();
+
+                        switchDashboard('library');
+
+                        alert(currentLang === 'ar' ? "تم نشر الكتاب بنجاح في المكتبة النشطة!" : "Book published successfully to active library!");
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error adding book:", err);
+                    alert(currentLang === 'ar' ? "حدث خطأ" : "An error occurred");
+                });
+        }
+
+        let activeAdminDeptFilter = '';
+
+        function renderAdminDepartmentFilters() {
+            const container = document.getElementById('adminDeptFilterPills');
+            if (!container) return;
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+
+            const depts = [
+                { id: '', en: 'All', ar: 'الكل' },
+                { id: 'Computer Engineering', en: 'Computer', ar: 'حاسوب' },
+                { id: 'Electrical Engineering', en: 'Electrical', ar: 'كهرباء' },
+                { id: 'Civil Engineering', en: 'Civil', ar: 'مدني' },
+                { id: 'Mechanical Engineering', en: 'Mechanical', ar: 'ميكانيك' }
+            ];
+
+            container.innerHTML = depts.map(d => {
+                const isActive = activeAdminDeptFilter === d.id;
+                const label = lang === 'ar' ? d.ar : d.en;
+                return `
+                    <button class="btn btn-sm rounded-pill px-3 py-1 fw-semibold transition-all ${isActive ? 'btn-brown' : 'btn-outline-secondary'}" 
+                            onclick="setAdminDepartmentFilter('${d.id}')"
+                            style="${isActive ? '' : 'border-color: rgba(60,42,33,0.15); color: var(--dark-espresso);'}">
+                        ${label}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function setAdminDepartmentFilter(dept) {
+            activeAdminDeptFilter = dept;
+            renderAdminDepartmentFilters();
+            displayLibraryBooks(dept);
+        }
+
+        function displayLibraryBooks(department = '') {
+            const container = document.getElementById('dynamicLibraryContainer');
+            const totalLabel = document.getElementById('lblTotalBooks');
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+
+            container.innerHTML = '';
+
+            let url = 'books.php';
+            const deptToUse = department || activeAdminDeptFilter;
+            if (deptToUse) {
+                url += '?department=' + encodeURIComponent(deptToUse);
+            }
+
+            fetchAPI(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.books) {
+                        currentBooks = data.books;
+                        totalLabel.innerText = currentLang === 'ar' ? `إجمالي الكتب: ${currentBooks.length}` : `Total Books: ${currentBooks.length}`;
+
+                        if (currentBooks.length === 0) {
+                            container.innerHTML = `<div class="text-center p-5 text-muted">${currentLang === 'ar' ? 'لا توجد كتب متاحة في المكتبة النشطة.' : 'No books available in the active library.'}</div>`;
+                            return;
+                        }
+
+                        currentBooks.forEach((book) => {
+                            const card = document.createElement('div');
+                            card.className = 'premium-card';
+
+                            let statusBadge = '';
+                            let approveButton = '';
+                            if (book.status === 'Pending') {
+                                statusBadge = `<span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">${currentLang === 'ar' ? 'بانتظار الموافقة' : 'Pending Approval'}</span>`;
+                                approveButton = `
+                                    <button class="btn btn-sm btn-success rounded-3 me-2" onclick="approveBook(${book.book_id})">
+                                        <i class="bi bi-check-lg me-1"></i> ${currentLang === 'ar' ? 'موافق ونشر' : 'Approve'}
+                                    </button>
+                                `;
+                            } else if (book.status === 'Available') {
+                                statusBadge = `<span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">${currentLang === 'ar' ? 'متاح في المركز' : 'Available in Hub'}</span>`;
+                            } else if (book.status === 'Borrowed') {
+                                statusBadge = `<span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">${currentLang === 'ar' ? 'مستعار حالياً' : 'Borrowed'}</span>`;
+                            } else if (book.status === 'Damaged') {
+                                statusBadge = `<span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">${currentLang === 'ar' ? 'تالف' : 'Damaged'}</span>`;
+                            }
+
+                            card.innerHTML = `
+                                <div class="row align-items-center">
+                                    <div class="col-md-1 text-center d-none d-md-block">
+                                        <div class="book-avatar" style="color: #0284c7;"><i class="bi bi-book"></i></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5 class="fw-bold mb-1 text-dark">${book.title}</h5>
+                                        <p class="text-muted small mb-0"><span class="lblAuthor">${currentLang === 'ar' ? 'المؤلف' : 'Author'}</span>: ${book.author} |
+                                            <span class="text-primary font-weight-600">${book.department}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        ${statusBadge}
+                                    </div>
+                                    <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                                        ${approveButton}
+                                        <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteBook(${book.book_id})">
+                                            <i class="bi bi-trash3-fill me-1"></i> <span>${currentLang === 'ar' ? 'حذف الكتاب' : 'Delete Book'}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            container.appendChild(card);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching books:", err);
+                });
+        }
+
+        function approveBook(bookId) {
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+            fetchAPI('books.php', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ book_id: bookId, status: 'Available' })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(currentLang === 'ar' ? "تمت الموافقة على الكتاب ونشره بنجاح!" : "Book approved and published successfully!");
+                        displayLibraryBooks();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert(currentLang === 'ar' ? "حدث خطأ أثناء الاتصال بالخادم." : "Error communicating with the server.");
+                });
+        }
+
+        function deleteBook(bookId) {
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+            const confirmMsg = currentLang === 'ar' ? 'هل أنت متأكد من حذف هذا الكتاب نهائياً؟' : 'Are you sure you want to permanently delete this book?';
+            if (confirm(confirmMsg)) {
+                fetchAPI('books.php', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ book_id: bookId })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            displayLibraryBooks();
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Error deleting book:", err);
+                    });
+            }
+        }
+
+        function loadRequests() {
+            const container = document.getElementById('requestsContainer');
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+            container.innerHTML = '';
+
+            fetchAPI('requests.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.requests) {
+                        if (data.requests.length === 0) {
+                            container.innerHTML = `<div class="text-center p-5 text-muted">
+                                ${currentLang === 'ar' ? 'لا توجد طلبات استعارة واردة حالياً.' : 'No incoming borrowing requests.'}
+                            </div>`;
+                            return;
+                        }
+
+                        data.requests.forEach(req => {
+                            const card = document.createElement('div');
+                            card.className = 'premium-card';
+
+                            let statusBadge = '';
+                            let actionButtons = '';
+
+                            if (req.status === 'Pending') {
+                                statusBadge = `<span class="badge bg-warning text-dark px-3 py-2 rounded-pill">${currentLang === 'ar' ? 'قيد الانتظار' : 'Pending'}</span>`;
+                                actionButtons = `
+                                    <button class="btn btn-sm btn-success rounded-3 me-2" onclick="updateRequestStatus(${req.request_id}, 'Approved')">
+                                        <i class="bi bi-check-lg me-1"></i> ${currentLang === 'ar' ? 'موافقة' : 'Approve'}
+                                    </button>
+                                    <button class="btn btn-sm btn-danger rounded-3" onclick="showRejectModal(${req.request_id})">
+                                        <i class="bi bi-x-lg me-1"></i> ${currentLang === 'ar' ? 'رفض' : 'Reject'}
+                                    </button>
+                                `;
+                            } else if (req.status === 'Approved') {
+                                statusBadge = `<span class="badge bg-success text-white px-3 py-2 rounded-pill">${currentLang === 'ar' ? 'تمت الموافقة' : 'Approved'}</span>`;
+                                actionButtons = `
+                                    <button class="btn btn-sm btn-brown rounded-3" onclick="updateRequestStatus(${req.request_id}, 'Returned')">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i> ${currentLang === 'ar' ? 'تأكيد الإرجاع' : 'Mark as Returned'}
+                                    </button>
+                                `;
+                            } else if (req.status === 'Rejected') {
+                                statusBadge = `<span class="badge bg-danger text-white px-3 py-2 rounded-pill">${currentLang === 'ar' ? 'مرفوض' : 'Rejected'}</span>`;
+                            } else if (req.status === 'Returned') {
+                                statusBadge = `<span class="badge bg-secondary text-white px-3 py-2 rounded-pill">${currentLang === 'ar' ? 'تم الإرجاع' : 'Returned'}</span>`;
+                            }
+
+                            const reqDate = new Date(req.request_date).toLocaleDateString();
+                            const deadline = req.return_deadline ? new Date(req.return_deadline).toLocaleDateString() : '-';
+                            const initials = req.student_name ? req.student_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'ST';
+
+                            card.innerHTML = `
+                                <div class="row align-items-center">
+                                    <div class="col-md-1 text-center d-none d-md-block">
+                                        <div class="student-avatar">${initials}</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5 class="fw-bold mb-1 text-dark">${req.book_title}</h5>
+                                        <p class="text-muted small mb-0">
+                                            <span>${currentLang === 'ar' ? 'الطالب' : 'Student'}</span>: ${req.student_name} (${req.student_id}) | 
+                                            <span class="text-primary font-weight-600">${req.department}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4 small text-muted">
+                                        <div><strong>${currentLang === 'ar' ? 'تاريخ الطلب' : 'Request Date'}:</strong> ${reqDate}</div>
+                                        <div><strong>${currentLang === 'ar' ? 'تاريخ الإرجاع المتوقع' : 'Return Deadline'}:</strong> ${deadline}</div>
+                                    </div>
+                                    <div class="col-md-3 text-md-end mt-3 mt-md-0 d-flex align-items-center justify-content-md-end gap-2">
+                                        ${statusBadge}
+                                        ${actionButtons}
+                                    </div>
+                                </div>
+                            `;
+                            container.appendChild(card);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching requests:", err);
+                });
+        }
+
+        function showRejectModal(requestId) {
+            activeRejectRequestId = requestId;
+            const modal = new bootstrap.Modal(document.getElementById('rejectReasonModal'));
+            modal.show();
+        }
+
+        function updateRequestStatus(requestId, status, reason = '') {
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+            fetchAPI('requests.php', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ request_id: requestId, status: status, reason: reason })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        loadRequests();
+                        loadStudents();
+                        loadAdminNotifications();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error updating request:", err);
+                    alert(currentLang === 'ar' ? "حدث خطأ" : "An error occurred");
+                });
+        }
+
+        function loadAdminNotifications() {
+            const container = document.getElementById('adminNotifContainer');
+            const badge = document.getElementById('adminNotifBadge');
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+            if (!container) return;
+
+            fetchAPI('notifications.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.notifications) {
+                        if (data.notifications.length === 0) {
+                            container.innerHTML = `<div class="text-center text-muted py-3" style="font-size:0.85rem;">${lang === 'ar' ? 'لا توجد إشعارات حالياً' : 'No notifications yet'}</div>`;
+                            badge.classList.add('d-none');
+                            if (currentSection === 'notifications') {
+                                const pageContainer = document.getElementById('divAdminPageNotifications');
+                                if (pageContainer) pageContainer.innerHTML = `<p class="text-center text-muted my-3">${lang === 'ar' ? 'لا توجد إشعارات.' : 'No notifications.'}</p>`;
+                            }
+                            return;
+                        }
+
+                        if (data.unread_count > 0) {
+                            badge.classList.remove('d-none');
+                        } else {
+                            badge.classList.add('d-none');
+                        }
+
+                        container.innerHTML = data.notifications.map(notif => {
+                            const isUnread = !notif.is_read;
+                            const itemBg = isUnread ? 'bg-light border-warning' : 'bg-white';
+                            return `
+                                <div class="p-2 mb-2 rounded border ${itemBg}" style="font-size:0.8rem; color: var(--dark-espresso);">
+                                    <div>${notif.message}</div>
+                                    <small class="text-muted d-block mt-1">${new Date(notif.sent_at).toLocaleString()}</small>
+                                </div>
+                            `;
+                        }).join('');
+                        if (currentSection === 'notifications') {
+                            const pageContainer = document.getElementById('divAdminPageNotifications');
+                            if (pageContainer) {
+                                pageContainer.innerHTML = data.notifications.map(notif => {
+                                    const isUnread = !notif.is_read;
+                                    const itemBg = isUnread ? 'bg-light border-warning' : 'bg-white';
+                                    return `
+                                        <div class="p-3 mb-2 rounded border ${itemBg}" style="font-size:0.9rem; color: var(--dark-espresso);">
+                                            <div>${notif.message}</div>
+                                            <small class="text-muted d-block mt-1">${new Date(notif.sent_at).toLocaleString()}</small>
+                                        </div>
+                                    `;
+                                }).join('');
+
+                                if (data.unread_count > 0) {
+                                    fetchAPI('notifications.php', { method: 'PUT' });
+                                    badge.classList.add('d-none');
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(err => console.error("Error loading admin notifications:", err));
+        }
+
+        function clearAdminNotifications(e) {
+            if (e) e.stopPropagation();
+            fetchAPI('notifications.php', { method: 'PUT' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const badge = document.getElementById('adminNotifBadge');
+                        if (badge) badge.classList.add('d-none');
+                    }
+                })
+                .catch(err => console.error("Error clearing admin notifications:", err));
+        }
+
+        function loadStudents() {
+            const tbody = document.getElementById('tblStudentsBody');
+            const currentLang = document.documentElement.getAttribute('lang') || 'en';
+            tbody.innerHTML = '';
+
+            fetchAPI('students.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.students) {
+                        if (data.students.length === 0) {
+                            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">${currentLang === 'ar' ? 'لا يوجد طلاب مسجلين حالياً.' : 'No registered students.'}</td></tr>`;
+                            return;
+                        }
+
+                        data.students.forEach(student => {
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">${student.full_name}</div>
+                                        <small class="text-muted">${student.email}</small>
+                                    </td>
+                                    <td>${student.user_id}</td>
+                                    <td><span class="badge bg-light text-dark border">${student.department}</span></td>
+                                    <td>
+                                        <span class="badge ${student.current_borrow_count > 0 ? 'bg-warning text-dark' : 'bg-success text-white'} px-2 py-1 rounded">
+                                            ${student.current_borrow_count} ${currentLang === 'ar' ? 'مستعار' : 'borrowed'}
+                                        </span>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error("Error loading students:", err);
+                });
+        }
+
+        document.getElementById('frmAddBook').addEventListener('submit', handleAddBook);
+
+
+        function toggleDashboardLanguage() {
+            const htmlTag = document.documentElement;
+            const mainContentZone = document.getElementById('mainContentZone');
+            const langBtn = document.getElementById('langToggleBtn');
+
+            mainContentZone.style.opacity = '0';
+
+            setTimeout(() => {
+                const isEn = htmlTag.getAttribute('lang') === 'en';
+                const nextLang = isEn ? 'ar' : 'en';
+
+                htmlTag.setAttribute('lang', nextLang);
+                htmlTag.setAttribute('dir', isEn ? 'rtl' : 'ltr');
+                langBtn.innerText = isEn ? 'English' : 'العربية';
+
+                updateDashboardStaticTexts(nextLang);
+                switchDashboard(currentSection);
+
+                mainContentZone.style.opacity = '1';
+            }, 400);
+        }
+
+        function updateDashboardStaticTexts(lang) {
+            const dictionary = {
+                ar: {
+                    lblNavRequests: 'الطلبات الواردة', lblNavLibrary: 'المكتبة النشطة',
+                    lblNavStudents: 'دليل الطلاب', lblNavSettings: 'تحديث كلمة المرور',
+                    lblLogout: 'تسجيل الخروج', sidebarBadge: 'لوحة التحكم الهندسية',
+                    topNavAdminName: 'مشرف النادي الهندسي',
+                    lblSetMainTitle: 'تحديث كلمة مرور المشرف', lblCurrentPassword: 'كلمة المرور الحالية',
+                    lblNewPassword: 'كلمة المرور الجديدة', btnSetSave: 'تحديث كلمة المرور',
+                    btnAddNewBook: 'إضافة كتاب جديد',
+                    thStudent: 'الطالب', thID: 'الرقم الجامعي', thDept: 'التخصص', thStatus: 'الحالة',
+                    modalAddTitle: 'إضافة كتاب جديد للمركز', lblMdlTitle: 'عنوان الكتاب',
+                    lblMdlAuthor: 'المؤلف', lblMdlDept: 'القسم المستهدف', btnMdlSubmit: 'نشر الكتاب في المنصة',
+                    lblRejectTitle: 'سبب الرفض للطلب', btnRejectCancel: 'إلغاء', btnRejectConfirm: 'تأكيد الرفض',
+                    lblAdminNotifTitle: 'الإشعارات', btnAdminNotifClear: 'تعيين الكل كمقروء',
+                    lblNavNotifications: 'الإشعارات الواردة', lblNotificationsTitleAdmin: 'سجل التنبيهات والإشعارات'
+                },
+                en: {
+                    lblNavRequests: 'Incoming Requests', lblNavLibrary: 'Active Library',
+                    lblNavStudents: 'Students Directory', lblNavSettings: 'Update Password',
+                    lblLogout: 'Log Out', sidebarBadge: 'Engineering Panel',
+                    topNavAdminName: 'Engineering Club Admin',
+                    lblSetMainTitle: 'Update Admin Password', lblCurrentPassword: 'Current Password',
+                    lblNewPassword: 'New Password', btnSetSave: 'Update Password',
+                    btnAddNewBook: 'Add New Book',
+                    thStudent: 'Student', thID: 'Student ID', thDept: 'Department', thStatus: 'Status',
+                    modalAddTitle: 'Add New Book to Hub', lblMdlTitle: 'Book Title',
+                    lblMdlAuthor: 'Author', lblMdlDept: 'Department', btnMdlSubmit: 'Publish Book',
+                    lblRejectTitle: 'Reason for Rejection', btnRejectCancel: 'Cancel', btnRejectConfirm: 'Reject',
+                    lblAdminNotifTitle: 'Notifications', btnAdminNotifClear: 'Mark all as read',
+                    lblNavNotifications: 'Notifications', lblNotificationsTitleAdmin: 'Notifications & Alerts'
+                }
+            };
+
+            for (let key in dictionary[lang]) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.innerText = dictionary[lang][key];
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
