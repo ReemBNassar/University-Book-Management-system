@@ -418,7 +418,7 @@
                         <h2 id="signupTitle" class="fw-bold mb-2">Create Account</h2>
                         <p id="signupSub" class="text-muted mb-4">Join our engineering community!</p>
 
-                        <form action="javascript:void(0)" onsubmit="triggerSuccessScreen()">
+                        <form id="signupForm" onsubmit="handleSignup(event)">
                             <div class="input-group-custom">
                                 <i class="bi bi-person"></i>
                                 <div class="form-floating">
@@ -501,6 +501,7 @@
 
 
     <script>
+
         const wrapper = document.getElementById('sliderWrapper');
         const forgotCard = document.getElementById('forgotCard');
 
@@ -525,17 +526,87 @@
             forgotCard.classList.remove('forgot-active');
             wrapper.style.opacity = '1';
         }
+
         function handleLogin(e) {
             e.preventDefault();
             const emailInput = document.getElementById('email').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('password').value;
 
-            if (emailInput === 'admin@unibook.com' || emailInput.startsWith('admin')) {
-                window.location.href = 'admin_dashboard.html';
-            } else {
-                window.location.href = 'student.html';
-            }
+            const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+
+            fetch('login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: emailInput,
+                    password: passwordInput
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        localStorage.setItem('isAdminLoggedIn', data.user.role === 'Admin' ? 'true' : 'false');
+
+                        if (data.user.role === 'Admin') {
+                            window.location.href = 'home.html';
+                        } else {
+                            window.location.href = 'student.html';
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (lang === 'ar') {
+                        alert("حدث خطأ أثناء الاتصال بالخادم.");
+                    } else {
+                        alert("An error occurred while connecting to the server.");
+                    }
+                });
         }
 
+        function handleSignup(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value.trim();
+            const studentId = document.getElementById('studentIdSignup').value.trim();
+            const email = document.getElementById('emailSignup').value.trim().toLowerCase();
+            const password = document.getElementById('passwordSignup').value;
+
+            const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+
+            fetch('register.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    full_name: fullName,
+                    user_id: studentId,
+                    email: email,
+                    password: password
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        triggerSuccessScreen();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (lang === 'ar') {
+                        alert("حدث خطأ أثناء الاتصال بالخادم.");
+                    } else {
+                        alert("An error occurred while connecting to the server.");
+                    }
+                });
+        }
         function triggerGoogleSync() {
             document.getElementById('screenGate').classList.remove('active-screen');
             document.getElementById('screenGoogleLoader').classList.add('active-screen');
@@ -548,11 +619,13 @@
                 setTimeout(() => {
                     status.innerText = lang === 'ar' ? "جاري التوجيه للبوابة..." : "Redirecting to Hub...";
                     setTimeout(() => {
-                        window.location.href = "student.html";
+                        localStorage.setItem('isAdminLoggedIn', 'true');
+                        window.location.href = "home.html";
                     }, 1000);
                 }, 1200);
             }, 1200);
         }
+
         function triggerSuccessScreen() {
             document.getElementById('screenGate').classList.remove('active-screen');
             document.getElementById('screenSuccess').classList.add('active-screen');
