@@ -4,10 +4,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$host = '127.0.0.1';
-$user = 'root';
-$pass = '';
-$db   = 'unibook_db';
+$host = 'sql203.infinityfree.com';         
+$user = 'if0_42311725';              
+$pass = 'Eu5iG5cS44l9H';
+$db   = 'if0_42311725_unibook';     
 $charset = 'utf8mb4';
 
 ini_set('display_errors', 1);
