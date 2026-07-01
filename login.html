@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniBook - Engineering Gate</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --main-brown: #8b5e3c;
+            --dark-brown: #643526;
+            --light-beige: #f4f1ee;
+            --dark-espresso: #3c2a21;
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-beige);
+            overflow-x: hidden;
+        }
+
+        .app-screen { display: none; min-height: 100vh; align-items: center; justify-content: center; animation: fadeInScreen 0.5s ease-out both; }
+        .app-screen.active-screen { display: flex !important; }
+        @keyframes fadeInScreen { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .slider-viewport { width: 950px; height: 570px; overflow: hidden; border-radius: 20px; box-shadow: 0 15px 30px rgba(101, 67, 33, 0.2); background: white; position: relative; }
+        .slider-wrapper { display: flex; width: 1900px; height: 100%; transition: opacity 0.5s ease; }
+        .allow-slider-transition { transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1) !important; }
+        .login-card, .signup-card { width: 950px; display: flex; height: 100%; flex-shrink: 0; }
+        .forgot-card { position: absolute; top: 0; left: 0; width: 950px; height: 100%; display: flex; background: white; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .forgot-active { opacity: 1; pointer-events: all; }
+        .form-section, .brand-section { transition: opacity 0.4s ease-in-out; opacity: 1; }
+        .brand-section { background: linear-gradient(rgba(139, 94, 60, 0.65), rgba(60, 42, 33, 0.8)), url('reem.png'); background-size: cover; background-position: center; color: white; padding: 40px; width: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; }
+        .brand-section h1 { font-weight: 800; font-size: 3.5rem; text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.8); }
+        .form-section { padding: 30px 50px; width: 50%; display: flex; flex-direction: column; justify-content: center; position: relative; background: white; }
+        .input-group-custom { position: relative; margin-bottom: 1rem; }
+        .input-group-custom i { position: absolute; top: 50%; transform: translateY(-50%); left: 15px; color: #a1887f; font-size: 1.25rem; z-index: 4; pointer-events: none; }
+        .input-group-custom .form-control { padding-left: 45px !important; }
+        .input-group-custom .form-floating>label { padding-left: 45px !important; }
+        [lang="ar"] .input-group-custom i { left: auto; right: 15px; }
+        [lang="ar"] .input-group-custom .form-control { padding-left: 12px !important; padding-right: 45px !important; }
+        [lang="ar"] .input-group-custom .form-floating>label { padding-left: 12px !important; padding-right: 45px !important; }
+        .lang-switcher { position: absolute; top: 20px; right: 20px; z-index: 10; }
+        .btn-brown { background-color: var(--main-brown); color: white; border: none; border-radius: 10px; padding: 12px; font-weight: 600; transition: all 0.3s; }
+        .btn-brown:hover { background-color: var(--dark-brown); transform: translateY(-2px); }
+        .btn-google { background-color: white; color: var(--dark-brown); border: 1px solid #d7ccc8; border-radius: 10px; padding: 10px; font-weight: 500; }
+        .text-brown { color: var(--main-brown) !important; text-decoration: none; font-weight: 600; cursor: pointer; }
+        .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; color: #aaa; font-size: 0.9rem; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
+        .slide-active { transform: translateX(-950px); }
+        [lang="ar"] .slide-active { transform: translateX(950px); }
+        .auth-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(101, 67, 33, 0.1); text-align: center; max-width: 400px; width: 90%; }
+        .google-logo { font-size: 2.5rem; margin-bottom: 20px; display: inline-block; }
+        .spinner-container { margin: 20px 0; }
+        .spinner-border { color: var(--main-brown); width: 2.5rem; height: 2.5rem; }
+        .success-card { padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 15px 35px rgba(101, 67, 33, 0.1); border: none; background: white; max-width: 450px; width: 90%; }
+        .alert-msg { font-size: 0.9rem; margin-bottom: 1rem; display: none; }
+        @media (max-width: 768px) {
+            .slider-viewport { width: 100%; height: auto; }
+            .login-card, .signup-card, .forgot-card { flex-direction: column; width: 100%; position: relative; }
+            .forgot-card { display: none; }
+            .forgot-card.forgot-active { display: flex; }
+            .brand-section, .form-section { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-screen active-screen" id="screenGate">
+        <div class="slider-viewport">
+
+            <div class="forgot-card" id="forgotCard">
+                <div class="form-section">
+                    <div class="lang-switcher">
+                        <button class="btn btn-sm btn-outline-secondary langBtn" onclick="toggleLanguage()">العربية</button>
+                    </div>
+                    <h2 id="forgotTitle" class="fw-bold mb-2">Reset Password</h2>
+                    <p id="forgotSub" class="text-muted mb-4">Enter your details to secure your account.</p>
+                    <form action="javascript:void(0)" onsubmit="handleResetSubmit()">
+                        <div class="input-group-custom">
+                            <i class="bi bi-card-text"></i>
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="studentIdForgot" placeholder="Student ID" required>
+                                <label for="studentIdForgot" id="idLabelForgot">Student ID</label>
+                            </div>
+                        </div>
+                        <div class="input-group-custom">
+                            <i class="bi bi-envelope"></i>
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="emailForgot" placeholder="name@student.com" required>
+                                <label for="emailForgot" id="emailForgotLabel">Student Email</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-brown w-100 mb-3" id="resetBtn">Send Reset Link</button>
+                    </form>
+                    <p class="text-center text-muted mb-0">
+                        <a href="javascript:void(0)" onclick="hideForgot()" class="text-brown" id="backToSignIn">Back to Sign In</a>
+                    </p>
+                </div>
+                <div class="brand-section">
+                    <h1 class="brandTitle">UniBook</h1>
+                    <h3 class="brandSub">Exchange Hub</h3>
+                    <p class="brandDesc mt-3">The best place for engineering students to trade knowledge.</p>
+                </div>
+            </div>
+
+            <div class="slider-wrapper" id="sliderWrapper">
+
+                <div class="login-card">
+                    <div class="form-section">
+                        <div class="lang-switcher">
+                            <button class="btn btn-sm btn-outline-secondary langBtn" onclick="toggleLanguage()">العربية</button>
+                        </div>
+                        <h2 id="loginTitle" class="fw-bold mb-2">Sign In</h2>
+                        <p id="loginSub" class="text-muted mb-4">Welcome, Engineer!</p>
+
+                        <div class="alert alert-danger alert-msg" id="loginError"></div>
+
+                        <form id="loginForm" onsubmit="handleLogin(event)">
+                            <div class="input-group-custom">
+                                <i class="bi bi-envelope"></i>
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="email" placeholder="name@student.com" required>
+                                    <label for="email" id="emailLabel">Email Address</label>
+                                </div>
+                            </div>
+                            <div class="input-group-custom">
+                                <i class="bi bi-lock"></i>
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" id="password" placeholder="Password" required>
+                                    <label for="password" id="passLabel">Password</label>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="remember">
+                                    <label class="form-check-label text-muted" for="remember" id="rememberLabel" style="font-size: 0.85rem;">Remember me</label>
+                                </div>
+                                <a onclick="showForgot()" class="text-brown" id="forgotPass" style="font-size: 0.85rem; cursor: pointer;">Forgot Password?</a>
+                            </div>
+                            <button type="submit" class="btn btn-brown w-100 mb-3" id="loginBtn">Login</button>
+                        </form>
+
+                        <div class="divider" id="dividerText">OR</div>
+                        <button type="button" class="btn btn-google w-100 mb-4" onclick="triggerGoogleSync()">
+                            <i class="bi bi-google me-2"></i> <span>Continue with Google</span>
+                        </button>
+                        <p class="text-center text-muted mb-0">
+                            <span id="noAccount">New to the Hub?</span>
+                            <a href="javascript:void(0)" onclick="goToSignup()" class="text-brown" id="signUpLink">Create an Account</a>
+                        </p>
+                    </div>
+                    <div class="brand-section">
+                        <h1 class="brandTitle">UniBook</h1>
+                        <h3 class="brandSub">Exchange Hub</h3>
+                        <p class="brandDesc mt-3">The best place for engineering students to trade knowledge.</p>
+                    </div>
+                </div>
+
+                <div class="signup-card">
+                    <div class="form-section">
+                        <div class="lang-switcher">
+                            <button class="btn btn-sm btn-outline-secondary langBtn" onclick="toggleLanguage()">العربية</button>
+                        </div>
+                        <h2 id="signupTitle" class="fw-bold mb-2">Create Account</h2>
+                        <p id="signupSub" class="text-muted mb-4">Join our engineering community!</p>
+
+<<<<<<< HEAD
+                        <form id="signupForm" onsubmit="handleSignup(event)">
+=======
+                        <div class="alert alert-danger alert-msg" id="signupError"></div>
+
+                        <form id="signupForm" action="javascript:void(0)" onsubmit="handleSignup(event)">
+>>>>>>> 1a1621e300292ff9375bb55b7ea70afe99ae47ab
+                            <div class="input-group-custom">
+                                <i class="bi bi-person"></i>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="fullName" placeholder="Full Name" required>
+                                    <label for="fullName" id="nameLabel">Full Name</label>
+                                </div>
+                            </div>
+                            <div class="input-group-custom">
+                                <i class="bi bi-card-text"></i>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="studentIdSignup" placeholder="Student ID" required>
+                                    <label for="studentIdSignup" id="idLabelSignup">Student ID</label>
+                                </div>
+                            </div>
+                            <div class="input-group-custom">
+                                <i class="bi bi-envelope"></i>
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="emailSignup" placeholder="name@student.com" required>
+                                    <label for="emailSignup" id="emailLabelSignup">Student Email</label>
+                                </div>
+                            </div>
+                            <div class="input-group-custom">
+                                <i class="bi bi-lock"></i>
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" id="passwordSignup" placeholder="Password" required>
+                                    <label for="passwordSignup" id="passLabelSignup">Password</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-brown w-100 mb-3" id="signupBtn">Sign Up</button>
+                        </form>
+                        <p class="text-center text-muted mb-0">
+                            <span id="haveAccount">Already have an account?</span>
+                            <a href="javascript:void(0)" onclick="goToLogin()" class="text-brown" id="signInLink">Sign In</a>
+                        </p>
+                    </div>
+                    <div class="brand-section">
+                        <h1 class="brandTitle">UniBook</h1>
+                        <h3 class="brandSub">Exchange Hub</h3>
+                        <p class="brandDesc mt-3">The best place for engineering students to trade knowledge.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="app-screen" id="screenGoogleLoader">
+        <div class="auth-card">
+            <div class="google-logo"><i class="bi bi-google" style="color: #8b5e3c;"></i></div>
+            <div class="spinner-container"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>
+            <div class="status-msg" id="statusText">Connecting to Google...</div>
+            <div class="user-hint" id="googleHint">Please wait while we sync your UniBook account.</div>
+        </div>
+    </div>
+
+    <div class="app-screen" id="screenSuccess">
+        <div class="success-card">
+            <div class="mb-3 text-success"><i class="bi bi-check-circle-fill" style="font-size: 3.5rem; color: var(--main-brown);"></i></div>
+            <h1 class="fw-bold h3 mb-2" id="successHeader">Account created successfully</h1>
+            <p class="text-muted mb-4" id="successSub">Welcome engineer in UniBook</p>
+            <button onclick="backFromSuccessToLogin()" class="btn btn-brown px-4 py-2" id="btnBackSuccess">Back to login</button>
+        </div>
+    </div>
+
+    <script src="api/api.js"></script>
+    <script>
+
+        const wrapper = document.getElementById('sliderWrapper');
+        const forgotCard = document.getElementById('forgotCard');
+
+        function goToSignup() { wrapper.classList.add('allow-slider-transition'); wrapper.classList.add('slide-active'); setTimeout(() => wrapper.classList.remove('allow-slider-transition'), 850); }
+        function goToLogin() { wrapper.classList.add('allow-slider-transition'); wrapper.classList.remove('slide-active'); setTimeout(() => wrapper.classList.remove('allow-slider-transition'), 850); }
+        function showForgot() { wrapper.style.opacity = '0'; forgotCard.classList.add('forgot-active'); }
+        function hideForgot() { forgotCard.classList.remove('forgot-active'); wrapper.style.opacity = '1'; }
+
+        function showMsg(id, text, isError = true) {
+            const el = document.getElementById(id);
+            el.innerText = text;
+            el.className = 'alert alert-msg ' + (isError ? 'alert-danger' : 'alert-success');
+            el.style.display = 'block';
+        }
+
+<<<<<<< HEAD
+        function goToLogin() {
+            wrapper.classList.add('allow-slider-transition');
+            wrapper.classList.remove('slide-active');
+            setTimeout(() => wrapper.classList.remove('allow-slider-transition'), 850);
+        }
+
+        function showForgot() {
+            wrapper.style.opacity = '0';
+            forgotCard.classList.add('forgot-active');
+        }
+
+        function hideForgot() {
+            forgotCard.classList.remove('forgot-active');
+            wrapper.style.opacity = '1';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('email').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('password').value;
+
+            const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+
+            fetch('login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: emailInput,
+                    password: passwordInput
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        localStorage.setItem('isAdminLoggedIn', data.user.role === 'Admin' ? 'true' : 'false');
+
+                        if (data.user.role === 'Admin') {
+                            window.location.href = 'home.html';
+                        } else {
+                            window.location.href = 'student.html';
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (lang === 'ar') {
+                        alert("حدث خطأ أثناء الاتصال بالخادم.");
+                    } else {
+                        alert("An error occurred while connecting to the server.");
+                    }
+                });
+=======
+        // ===== تسجيل الدخول الحقيقي =====
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            btn.disabled = true; btn.innerText = '...';
+            try {
+                const res = await apiPost('login.php', { email, password });
+                if (res.success) {
+                    window.location.href = res.redirect; // student.html أو admin_dashboard.html
+                } else {
+                    showMsg('loginError', res.message || 'فشل تسجيل الدخول');
+                }
+            } catch (err) {
+                showMsg('loginError', 'تعذّر الاتصال بالخادم');
+            }
+            btn.disabled = false; btn.innerText = 'Login';
+        }
+
+        // ===== التسجيل الحقيقي =====
+        async function handleSignup(e) {
+            e.preventDefault();
+            const btn = document.getElementById('signupBtn');
+            const full_name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('emailSignup').value.trim();
+            const password = document.getElementById('passwordSignup').value;
+            btn.disabled = true; btn.innerText = '...';
+            try {
+                const res = await apiPost('signup.php', { full_name, email, password });
+                if (res.success) {
+                    triggerSuccessScreen();
+                } else {
+                    showMsg('signupError', res.message || 'فشل إنشاء الحساب');
+                }
+            } catch (err) {
+                showMsg('signupError', 'تعذّر الاتصال بالخادم');
+            }
+            btn.disabled = false; btn.innerText = 'Sign Up';
+>>>>>>> 1a1621e300292ff9375bb55b7ea70afe99ae47ab
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value.trim();
+            const studentId = document.getElementById('studentIdSignup').value.trim();
+            const email = document.getElementById('emailSignup').value.trim().toLowerCase();
+            const password = document.getElementById('passwordSignup').value;
+
+            const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+
+            fetch('register.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    full_name: fullName,
+                    user_id: studentId,
+                    email: email,
+                    password: password
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        triggerSuccessScreen();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (lang === 'ar') {
+                        alert("حدث خطأ أثناء الاتصال بالخادم.");
+                    } else {
+                        alert("An error occurred while connecting to the server.");
+                    }
+                });
+        }
+        function triggerGoogleSync() {
+<<<<<<< HEAD
+            document.getElementById('screenGate').classList.remove('active-screen');
+            document.getElementById('screenGoogleLoader').classList.add('active-screen');
+
+            const status = document.getElementById('statusText');
+            const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+
+            setTimeout(() => {
+                status.innerText = lang === 'ar' ? "جاري التحقق من الهوية..." : "Verifying Credentials...";
+                setTimeout(() => {
+                    status.innerText = lang === 'ar' ? "جاري التوجيه للبوابة..." : "Redirecting to Hub...";
+                    setTimeout(() => {
+                        localStorage.setItem('isAdminLoggedIn', 'true');
+                        window.location.href = "home.html";
+                    }, 1000);
+                }, 1200);
+            }, 1200);
+=======
+            // Google login مش مفعّل في الباك — نوجّه المستخدم لاستخدام الإيميل
+            showMsg('loginError', 'تسجيل الدخول عبر Google غير مفعّل. برجاء استخدام البريد وكلمة المرور.');
+>>>>>>> 1a1621e300292ff9375bb55b7ea70afe99ae47ab
+        }
+
+        function triggerSuccessScreen() {
+            document.getElementById('screenGate').classList.remove('active-screen');
+            document.getElementById('screenSuccess').classList.add('active-screen');
+        }
+        function backFromSuccessToLogin() {
+            document.getElementById('screenSuccess').classList.remove('active-screen');
+            document.getElementById('screenGate').classList.add('active-screen');
+            goToLogin();
+        }
+
+        function handleResetSubmit() {
+            // ملاحظة: إرسال إيميل فعلي يحتاج إعداد بريد على السيرفر، فده عرض توضيحي
+            const email = document.getElementById('emailForgot').value;
+            const statusText = document.getElementById('forgotSub');
+            statusText.innerText = "إن وُجد حساب بهذا البريد، سيصلك رابط إعادة التعيين: " + email;
+            statusText.style.color = "green";
+        }
+
+        // ===== الترجمة (نفس الأصلي) =====
+        function toggleLanguage() {
+            const htmlTag = document.documentElement;
+            const langButtons = document.querySelectorAll('.langBtn');
+            const sections = document.querySelectorAll('.form-section, .brand-section');
+            sections.forEach(s => s.style.opacity = '0');
+            setTimeout(() => {
+                const isEn = htmlTag.getAttribute('lang') === 'en';
+                if (isEn) { htmlTag.setAttribute('lang', 'ar'); htmlTag.setAttribute('dir', 'rtl'); langButtons.forEach(btn => btn.innerText = 'English'); updateTexts('ar'); }
+                else { htmlTag.setAttribute('lang', 'en'); htmlTag.setAttribute('dir', 'ltr'); langButtons.forEach(btn => btn.innerText = 'العربية'); updateTexts('en'); }
+                sections.forEach(s => s.style.opacity = '1');
+            }, 400);
+        }
+
+        function updateTexts(lang) {
+            const texts = {
+                ar: { loginTitle: 'تسجيل الدخول', loginSub: 'أهلاً بك، بشمهندس!', emailLabel: 'البريد الإلكتروني', passLabel: 'كلمة المرور', rememberLabel: 'تذكرني', forgotPass: 'نسيت كلمة المرور؟', loginBtn: 'دخول', dividerText: 'أو', noAccount: 'جديد هنا؟', signUpLink: 'أنشئ حسابك الآن', signupTitle: 'إنشاء حساب', signupSub: 'انضم لمجتمع المهندسين!', nameLabel: 'الاسم الكامل', emailLabelSignup: 'البريد الجامعي', passLabelSignup: 'كلمة المرور', signupBtn: 'إنشاء الحساب', haveAccount: 'لديك حساب بالفعل؟', signInLink: 'تسجيل الدخول', brandTitle: 'الكتب الجامعية', brandSub: 'مركز التبادل', brandDesc: 'المكان الأفضل لطلاب الهندسة لتبادل المعرفة والكتب.', idLabelSignup: 'الرقم الجامعي', forgotTitle: 'استعادة كلمة المرور', forgotSub: 'أدخل بياناتك الجامعية لتأمين حسابك.', idLabelForgot: 'الرقم الجامعي', emailForgotLabel: 'البريد الجامعي', resetBtn: 'إرسال رابط التعيين', backToSignIn: 'العودة لتسجيل الدخول', successHeader: 'تم إنشاء الحساب بنجاح!', successSub: 'مرحباً بك كمهندس فاعل في عائلة UniBook.', btnBackSuccess: 'العودة لتسجيل الدخول' },
+                en: { loginTitle: 'Sign In', loginSub: 'Welcome, Engineer!', emailLabel: 'Email Address', passLabel: 'Password', rememberLabel: 'Remember me', forgotPass: 'Forgot Password?', loginBtn: 'Login', dividerText: 'OR', noAccount: 'New to the Hub?', signUpLink: 'Create an Account', signupTitle: 'Create Account', signupSub: 'Join our engineering community!', nameLabel: 'Full Name', emailLabelSignup: 'Student Email', passLabelSignup: 'Password', signupBtn: 'Sign Up', haveAccount: 'Already have an account?', signInLink: 'Sign In', brandTitle: 'UniBook', brandSub: 'Exchange Hub', brandDesc: 'The best place for engineering students to trade knowledge.', idLabelSignup: 'Student ID', forgotTitle: 'Reset Password', forgotSub: 'Enter your details to secure your account.', idLabelForgot: 'Student ID', emailForgotLabel: 'Student Email', resetBtn: 'Send Reset Link', backToSignIn: 'Back to Sign In', successHeader: 'Account created successfully', successSub: 'Welcome engineer in UniBook', btnBackSuccess: 'Back to login' }
+            };
+            for (let id in texts[lang]) { const el = document.getElementById(id); if (el) el.innerText = texts[lang][id]; }
+            document.querySelectorAll('.brandTitle').forEach(el => el.innerText = texts[lang].brandTitle);
+            document.querySelectorAll('.brandSub').forEach(el => el.innerText = texts[lang].brandSub);
+            document.querySelectorAll('.brandDesc').forEach(el => el.innerText = texts[lang].brandDesc);
+            const switchers = document.querySelectorAll('.lang-switcher');
+            switchers.forEach(s => { if (lang === 'ar') { s.style.right = 'auto'; s.style.left = '20px'; } else { s.style.left = 'auto'; s.style.right = '20px'; } });
+        }
+    </script>
+</body>
+<<<<<<< HEAD
+
+</html>
+=======
+</html>
+>>>>>>> 1a1621e300292ff9375bb55b7ea70afe99ae47ab

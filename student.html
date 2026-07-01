@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniBook - Engineering Student Hub</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --dark-espresso: #3c2a21;
+            --warm-chocolate: #5c4033;
+            --classic-tan: #8b5e3c;
+            --creamy-beige: #fdfbf7;
+            --pure-white: #ffffff;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f2eb 0%, #e8e3d7 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .student-navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(60, 42, 33, 0.03);
+        }
+
+        .nav-link-custom {
+            color: var(--dark-espresso);
+            font-weight: 500;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background-color: var(--classic-tan);
+            color: white;
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(60, 42, 33, 0.06);
+
+            border-radius: 20px;
+            padding: 2px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            width: 40px;
+            height: 40px;
+            justify-content: center;
+        }
+
+        .search-input {
+            width: 0px;
+            height: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 0;
+            color: var(--dark-espresso);
+            font-weight: 500;
+            transition: width 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.3s;
+            opacity: 0;
+        }
+
+        .search-icon-btn {
+            font-size: 1.1rem;
+            color: var(--dark-espresso);
+            transition: transform 0.3s ease;
+        }
+
+        .search-wrapper.active-search {
+            width: 220px;
+            background: var(--creamy-beige);
+            border: 1px solid #e0dcd3;
+            padding-left: 12px;
+            padding-right: 12px;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(60, 42, 33, 0.05);
+        }
+
+        .search-wrapper.active-search .search-input {
+            width: 165px;
+            opacity: 1;
+            padding-left: 5px;
+        }
+
+        [lang="ar"] .search-wrapper.active-search {
+            padding-right: 12px;
+            padding-left: 12px;
+        }
+
+        [lang="ar"] .search-wrapper.active-search .search-input {
+            padding-right: 5px;
+            padding-left: 0;
+            text-align: right;
+        }
+
+
+        .book-card-premium {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(60, 42, 33, 0.02);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .book-card-premium:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 35px rgba(60, 42, 33, 0.08);
+            background: var(--pure-white);
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .book-cover-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #fdfbf7 0%, #eaddca 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: var(--classic-tan);
+            margin-bottom: 15px;
+            border: 1px solid rgba(139, 94, 60, 0.1);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .book-cover-placeholder i {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s;
+        }
+
+        .icon-jump i {
+            transform: translateY(-20px) scale(1.15);
+            color: var(--dark-espresso);
+        }
+
+        .btn-premium {
+            background-color: var(--classic-tan);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-premium:hover {
+            background-color: var(--dark-espresso);
+            box-shadow: 0 6px 15px rgba(60, 42, 33, 0.2);
+        }
+
+        .submission-box {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(60, 42, 33, 0.05);
+
+        }
+
+        .fade-zone {
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
+        [lang="ar"] .text-end {
+            text-align: left !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="student-navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-book-half fs-3" style="color: var(--classic-tan);"></i>
+                <span class="fw-bold text-dark fs-4 mb-0">UniBook</span>
+            </div>
+
+            <div class="d-flex gap-2 align-items-center">
+                <a id="lnkExplore" onclick="switchStudentSection('explore')" class="nav-link-custom active"><i
+                        class="bi bi-grid-fill me-1"></i> <span id="lblNavExplore">Explore Books</span></a>
+                <a id="lnkShare" onclick="switchStudentSection('share')" class="nav-link-custom"><i
+                        class="bi bi-plus-circle-fill me-1"></i> <span id="lblNavShare">Share a Book</span></a>
+                <a id="lnkRequests" onclick="switchStudentSection('requests')"
+                    class="nav-link-custom position-relative"><i class="bi bi-clock-history me-1"></i> <span
+                        id="lblNavRequests">My Requests</span>
+                    <span class="badge rounded-pill bg-danger d-none" id="notifBadgeCount"
+                        style="position: absolute; top: -5px; right: -5px; font-size: 0.7rem;">0</span>
+                </a>
+
+                <div class="search-wrapper" id="searchWrapper" onclick="toggleSearchZone(event)">
+                    <i class="bi bi-search search-icon-btn"></i>
+                    <input type="text" class="search-input" id="txtSearchBook" placeholder="Search book...">
+                </div>
+
+                <button class="btn btn-sm btn-outline-secondary px-3 rounded-pill ms-2" id="studentLangBtn"
+                    onclick="toggleStudentLanguage()">العربية</button>
+                <a onclick="handleLogout(event)" class="btn btn-sm btn-outline-danger rounded-pill px-3 ms-2"
+                    style="cursor:pointer;"><i class="bi bi-box-arrow-left"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5 fade-zone" id="studentMainContent">
+
+        <div id="sectionExplore">
+
+            <div class="welcome-card-premium p-4 mb-4 rounded-4"
+                style="background: linear-gradient(135deg, var(--dark-espresso) 0%, var(--warm-chocolate) 100%); color: white; box-shadow: 0 10px 30px rgba(60,42,33,0.15); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                <div style="flex: 1; min-width: 280px;">
+                    <h3 class="fw-bold mb-2" id="lblWelcomeMessage">Welcome, Engineer! 👋</h3>
+                    <p class="mb-0 text-white-50 small italic" id="lblWelcomeQuote" style="font-style: italic;">
+                        "Scientists study the world as it is; engineers create the world that has never been."</p>
+                </div>
+                <div class="d-flex align-items-center gap-4 bg-white bg-opacity-10 p-3 rounded-4"
+                    style="backdrop-filter: blur(10px); flex-wrap: wrap;">
+                    <div class="text-center">
+                        <div class="small text-white-50" id="lblWelcomeDeptTitle" style="font-size:0.75rem;">Department
+                        </div>
+                        <div class="fw-bold text-warning" id="welcomeStudentDept" style="font-size: 0.9rem;">-</div>
+                    </div>
+                    <div class="border-start border-white-50 border-opacity-25 h-100 d-none d-sm-block"
+                        style="width: 1px; min-height: 40px;"></div>
+                    <div class="text-center" style="min-width: 150px;">
+                        <div class="small text-white-50 mb-1" id="lblWelcomeBorrowTitle" style="font-size:0.75rem;">
+                            Borrowing Limit</div>
+                        <div class="progress mb-1" style="height: 6px; background: rgba(255,255,255,0.2);">
+                            <div class="progress-bar bg-success" id="welcomeBorrowProgress" role="progressbar"
+                                style="width: 0%;"></div>
+                        </div>
+                        <div class="small fw-bold" id="welcomeBorrowText" style="font-size:0.8rem;">0 / 3 books</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4 align-items-center">
+                <div class="col-md-7">
+                    <h2 class="fw-bold text-dark mb-1" id="lblExploreTitle">Available Engineering Books</h2>
+                    <p class="text-muted mb-3 mb-md-0" id="lblExploreSub">Find resources donated by fellow engineers for
+                        your courses.</p>
+                </div>
+                <div class="col-md-5 d-flex justify-content-md-end">
+                    <div class="d-flex flex-wrap gap-2" id="deptFilterPills">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+            </div>
+        </div>
+
+        <div id="sectionShare" class="d-none">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="submission-box">
+                        <h3 class="fw-bold text-dark mb-2" id="lblShareTitle"><i class="bi bi-arrow-up-circle-fill me-2"
+                                style="color: var(--classic-tan);"></i> Submit a Book to the Club</h3>
+                        <p class="text-muted mb-4" id="lblShareSub">Fill in the details. The engineering club will
+                            verify and list it for other students.</p>
+
+                        <form id="frmShareBook" onsubmit="handleStudentSubmit(event)">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-muted" id="lblFormBookName">Book
+                                        Title</label>
+                                    <input type="text" class="form-control p-3 rounded-3" id="txtFormBookName"
+                                        placeholder="e.g., Microprocessors" required
+                                        style="background: var(--creamy-beige); border: 1px solid #e0dcd3;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-muted" id="lblFormAuthor">Author</label>
+                                    <input type="text" class="form-control p-3 rounded-3" id="txtFormAuthor"
+                                        placeholder="e.g., Douglas Hall" required
+                                        style="background: var(--creamy-beige); border: 1px solid #e0dcd3;">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold text-muted" id="lblFormDept">Engineering
+                                        Department</label>
+                                    <select class="form-select p-3 rounded-3" id="txtFormDept" name="department"
+                                        style="background: var(--creamy-beige); border: 1px solid #e0dcd3;" required>
+                                        <option value="" selected disabled hidden>Choose Department</option>
+                                        <option value="Computer Engineering">Computer Engineering</option>
+                                        <option value="Electrical Engineering">Electrical Engineering</option>
+                                        <option value="Civil Engineering">Civil Engineering</option>
+                                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                        <option value="Architecture Engineering">Architecture Engineering</option>
+                                        <option value="Smart Systems Engineering">Smart Systems Engineering</option>
+                                        <option value="Industrial engineering">Industrial engineering</option>
+                                        <option value="Environmental engineering">Environmental engineering</option>
+                                        <option value="Artificial Intelligence Engineering">Artificial Intelligence
+                                            Engineering</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold text-muted" id="lblFormMsg">Message to the Club
+                                        (Condition, Notes)</label>
+                                    <textarea class="form-control p-3 rounded-3" id="txtFormMsg" rows="4"
+                                        placeholder="Mention if it has markings, your contact note, etc..."
+                                        style="background: var(--creamy-beige); border: 1px solid #e0dcd3;"></textarea>
+                                </div>
+                                <div class="col-12 mt-4 text-end">
+                                    <button type="submit" class="btn btn-premium px-5 py-3 rounded-3"
+                                        id="btnFormSubmit">Send to Club</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sectionRequests" class="d-none">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="submission-box mb-4">
+                        <h3 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history me-2"
+                                style="color: var(--classic-tan);"></i> <span id="lblRequestsTitle">My Borrowing
+                                Requests</span></h3>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Request Date</th>
+                                        <th>Deadline</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblStudentRequestsBody">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="submission-box">
+                        <h3 class="fw-bold text-dark mb-3"><i class="bi bi-bell-fill me-2"
+                                style="color: var(--classic-tan);"></i> <span
+                                id="lblNotificationsTitle">Notifications</span></h3>
+                        <div id="divStudentNotifications">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const currentRole = 'Student';
+        function fetchAPI(url, options = {}) {
+            let separator = url.includes('?') ? '&' : '?';
+            let targetUrl = url;
+
+            const userStr = localStorage.getItem('user');
+            const expectedUserId = userStr ? JSON.parse(userStr).user_id : '';
+
+            if (!url.includes('expected_role=')) {
+                targetUrl = url + separator + 'expected_role=' + currentRole;
+                separator = '&';
+            }
+            if (expectedUserId && !url.includes('expected_user_id=')) {
+                targetUrl = targetUrl + separator + 'expected_user_id=' + expectedUserId;
+            }
+
+            return window.fetch(targetUrl, options)
+                .then(res => {
+                    if (res.status === 401) {
+                        localStorage.clear();
+                        window.location.href = "login.html";
+                        throw new Error("Unauthorized");
+                    }
+                    return res;
+                });
+        }
+
+        let currentStudentSection = localStorage.getItem('currentStudentSection') || 'explore';
+        let booksData = [];
+        let activeDepartmentFilter = '';
+
+        const studentTranslations = {
+            en: {
+                explore: { title: 'Available Engineering Books', sub: 'Find resources donated by fellow engineers for your courses.' },
+                share: { title: 'Submit a Book to the Club', sub: 'Fill in the details. The engineering club will verify and list it for other students.' },
+                requests: { title: 'My Requests & Notifications', sub: 'Monitor status of your borrow requests and read alerts.' }
+            },
+            ar: {
+                explore: { title: 'الكتب الهندسية المتاحة', sub: 'ابحث عن الكتب والمراجع المقدمة من زملائك المهندسين لدعم مساقك الدراسي.' },
+                share: { title: 'إرسال كتاب إلى مقر النادي', sub: 'أدخل بيانات الكتاب وسيقوم النادي بمراجعتها ونشرها فوراً لباقي الطلاب.' },
+                requests: { title: 'طلباتي والإشعارات', sub: 'تابع حالة طلبات الاستعارة الخاصة بك واقرأ التنبيهات المستلمة.' }
+            }
+        };
+
+        const engineeringQuotes = {
+            en: [
+                '"Scientists study the world as it is; engineers create the world that has never been." - Theodore von Kármán',
+                '"An investment in knowledge pays the best interest." - Benjamin Franklin',
+                '"Engineering is the closest thing to magic that exists in the world." - Elon Musk',
+                '"The only way to learn a new programming language is by writing programs in it." - Dennis Ritchie'
+            ],
+            ar: [
+                '"العلماء يدرسون العالم كما هو، أما المهندسون فيخلقون عالماً لم يكن موجوداً." - تيودور فون كارمان',
+                '"الاستثمار في المعرفة يحقق العائد الأفضل دائماً." - بنجامين فرانكلين',
+                '"الهندسة هي أقرب شيء للسحر في هذا العالم." - إيلون ماسك',
+                '"الطريقة الوحيدة لتعلم لغة برمجة جديدة هي كتابة البرامج بها." - دينيس ريتشي'
+            ]
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            checkAuth();
+            loadBooks();
+            renderDepartmentFilters();
+
+
+            document.getElementById('txtSearchBook').addEventListener('input', function (e) {
+                loadBooks(e.target.value.trim(), activeDepartmentFilter);
+            });
+
+
+            setInterval(updateNotifBadge, 15000);
+        });
+
+        function checkAuth() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const localUser = JSON.parse(userStr);
+
+            updateStatsUI(localUser);
+            displayRandomQuote(document.documentElement.getAttribute('lang') || 'en');
+            switchStudentSection(currentStudentSection);
+            updateNotifBadge();
+
+            fetchAPI('profile.php')
+                .then(res => {
+                    if (res.status === 200) {
+                        return res.json();
+                    }
+                    throw new Error('Not logged in');
+                })
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('user', JSON.stringify(data.profile));
+                        updateStatsUI(data.profile);
+                    }
+                })
+                .catch(err => {
+                    console.warn("Session sync warning:", err);
+
+                });
+        }
+
+        function displayRandomQuote(lang) {
+            const quotes = engineeringQuotes[lang] || engineeringQuotes['en'];
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            const quoteEl = document.getElementById('lblWelcomeQuote');
+            if (quoteEl) quoteEl.innerText = quotes[randomIndex];
+        }
+
+        function updateStatsUI(profile) {
+            const deptEl = document.getElementById('welcomeStudentDept');
+            const progressEl = document.getElementById('welcomeBorrowProgress');
+            const textEl = document.getElementById('welcomeBorrowText');
+            const welcomeMsgEl = document.getElementById('lblWelcomeMessage');
+
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+
+            if (welcomeMsgEl) {
+                welcomeMsgEl.innerText = lang === 'ar'
+                    ? `أهلاً بك مجدداً يا مهندس، ${profile.full_name}! 👋`
+                    : `Welcome back, Engineer ${profile.full_name}! 👋`;
+            }
+
+            if (deptEl) {
+                const deptVal = profile.department || '-';
+                if (lang === 'ar') {
+                    const deptMap = {
+                        'Computer Engineering': 'هندسة الحاسوب',
+                        'Electrical Engineering': 'الهندسة الكهربائية',
+                        'Civil Engineering': 'الهندسة المدنية',
+                        'Mechanical Engineering': 'الهندسة الميكانيكية'
+                    };
+                    deptEl.innerText = deptMap[deptVal] || deptVal;
+                } else {
+                    deptEl.innerText = deptVal;
+                }
+            }
+
+            if (progressEl && textEl) {
+                const borrowCount = parseInt(profile.current_borrow_count || 0);
+                const percentage = (borrowCount / 3) * 100;
+                progressEl.style.width = percentage + '%';
+
+                if (borrowCount >= 3) {
+                    progressEl.className = 'progress-bar bg-danger';
+                } else if (borrowCount === 2) {
+                    progressEl.className = 'progress-bar bg-warning';
+                } else {
+                    progressEl.className = 'progress-bar bg-success';
+                }
+
+                textEl.innerText = lang === 'ar'
+                    ? `${borrowCount} / 3 كتب مستعارة`
+                    : `${borrowCount} / 3 books borrowed`;
+            }
+        }
+
+        function updateNotifBadge() {
+            fetchAPI('notifications.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const badge = document.getElementById('notifBadgeCount');
+                        if (badge) {
+                            if (data.unread_count > 0) {
+                                badge.innerText = data.unread_count;
+                                badge.classList.remove('d-none');
+                            } else {
+                                badge.classList.add('d-none');
+                            }
+                        }
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+
+        function renderDepartmentFilters() {
+            const container = document.getElementById('deptFilterPills');
+            if (!container) return;
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+
+            const depts = [
+                { id: '', en: 'All', ar: 'الكل' },
+                { id: 'Computer Engineering', en: 'Computer', ar: 'حاسوب' },
+                { id: 'Electrical Engineering', en: 'Electrical', ar: 'كهرباء' },
+                { id: 'Civil Engineering', en: 'Civil', ar: 'مدني' },
+                { id: 'Mechanical Engineering', en: 'Mechanical', ar: 'ميكانيك' },
+                { id: 'Architecture Engineering', en: 'Architecture', ar: 'معماري' },
+                { id: 'Smart Systems Engineering', en: 'Smart Systems', ar: 'انظمة ذكية' },
+                { id: 'Industrial engineering', en: 'Industrial', ar: 'صناعية' },
+                { id: 'Environmental engineering', en: 'Environmental', ar: 'بيئية' },
+                { id: 'Artificial Intelligence Engineering', en: 'Artificial Intelligence', ar: 'ذكاء صناعي' }
+            ];
+
+            container.innerHTML = depts.map(d => {
+                const isActive = activeDepartmentFilter === d.id;
+                const label = lang === 'ar' ? d.ar : d.en;
+                return `
+                    <button class="btn btn-sm rounded-pill px-3 py-1 fw-semibold transition-all ${isActive ? 'btn-premium' : 'btn-outline-secondary'}" 
+                            onclick="setDepartmentFilter('${d.id}')"
+                            style="${isActive ? '' : 'border-color: rgba(60,42,33,0.15); color: var(--dark-espresso);'}">
+                        ${label}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function setDepartmentFilter(dept) {
+            activeDepartmentFilter = dept;
+            renderDepartmentFilters();
+            const searchQuery = document.getElementById('txtSearchBook').value.trim();
+            loadBooks(searchQuery, dept);
+        }
+
+        function loadBooks(searchQuery = '', department = '') {
+            let url = 'books.php';
+            const params = [];
+            if (searchQuery) {
+                params.push('search=' + encodeURIComponent(searchQuery));
+            }
+            if (department || activeDepartmentFilter) {
+                params.push('department=' + encodeURIComponent(department || activeDepartmentFilter));
+            }
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            fetchAPI(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        booksData = data.books;
+                        renderBooks();
+                    }
+                });
+        }
+
+        function renderBooks() {
+            const container = document.querySelector("#sectionExplore .row.g-4");
+            container.innerHTML = '';
+
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+
+            if (booksData.length === 0) {
+                container.innerHTML = `<div class="col-12 text-center text-muted my-5">
+                    ${lang === 'ar' ? 'لا توجد كتب متاحة حالياً.' : 'No books available currently.'}
+                </div>`;
+                return;
+            }
+
+            booksData.forEach(book => {
+                const isAvailable = book.status === 'Available';
+                const statusText = isAvailable
+                    ? (lang === 'ar' ? 'متاح' : 'Available')
+                    : (book.status === 'Borrowed'
+                        ? (lang === 'ar' ? 'مستعار' : 'Borrowed')
+                        : (lang === 'ar' ? 'تالف' : 'Damaged'));
+
+                const statusColorClass = isAvailable ? 'text-success' : 'text-danger';
+                const statusIcon = isAvailable ? 'bi-check-circle-fill' : 'bi-dash-circle-fill';
+
+                let actionButton = '';
+                if (isAvailable) {
+                    actionButton = `<button class="btn-premium btn-sm" onclick="event.stopPropagation(); requestBook(${book.book_id});"><i class="bi bi-chat-left-text me-1"></i> ${lang === 'ar' ? 'طلب استعارة' : 'Request'}</button>`;
+                } else {
+                    actionButton = `<button class="btn-premium btn-sm btn-outline-secondary" onclick="event.stopPropagation(); joinWaitlist(${book.book_id});" style="border: 1px solid var(--classic-tan); color: var(--classic-tan); background: transparent;"><i class="bi bi-bell me-1"></i> ${lang === 'ar' ? 'تنبيهي عند التوفر' : 'Notify Me'}</button>`;
+                }
+
+
+                let coverStyle = 'background: linear-gradient(135deg, #fdfbf7 0%, #eaddca 100%); color: var(--classic-tan);';
+                let iconClass = 'bi-book';
+                let badgeColor = 'bg-secondary';
+
+                if (book.department.includes('Computer')) {
+                    coverStyle = 'background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white;';
+                    iconClass = 'bi-cpu';
+                    badgeColor = 'bg-primary';
+                } else if (book.department.includes('Electrical')) {
+                    coverStyle = 'background: linear-gradient(135deg, #78350f 0%, #d97706 100%); color: white;';
+                    iconClass = 'bi-lightning-charge';
+                    badgeColor = 'bg-warning text-dark';
+                } else if (book.department.includes('Civil')) {
+                    coverStyle = 'background: linear-gradient(135deg, #064e3b 0%, #059669 100%); color: white;';
+                    iconClass = 'bi-buildings';
+                    badgeColor = 'bg-success';
+                } else if (book.department.includes('Mechanical')) {
+                    coverStyle = 'background: linear-gradient(135deg, #374151 0%, #4b5563 100%); color: white;';
+                    iconClass = 'bi-gear-wide-connected';
+                    badgeColor = 'bg-dark';
+                } else if (book.department.includes('AI') || book.department.includes('Artificial')) {
+                    coverStyle = 'background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%); color: white;';
+                    iconClass = 'bi-robot';
+                    badgeColor = 'bg-info text-white';
+                }
+
+                const cardHtml = `
+                    <div class="col-md-4 col-sm-6 animate-card" style="animation: cardSlideUp 0.5s ease-out;">
+                        <div class="book-card-premium" onclick="triggerIconJump(this)">
+                            <div>
+                                <div class="book-cover-placeholder" style="${coverStyle}"><i class="bi ${iconClass}"></i></div>
+                                <span class="badge ${badgeColor} text-white mb-2" style="font-size:0.75rem;">${book.department}</span>
+                                <h5 class="fw-bold text-dark mb-1" style="font-size:1.1rem; line-height: 1.4;">${book.title}</h5>
+                                <p class="text-muted small mb-3">${lang === 'ar' ? 'المؤلف' : 'Author'}: ${book.author}</p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                <span class="${statusColorClass} small fw-bold"><i class="bi ${statusIcon}"></i> ${statusText}</span>
+                                ${actionButton}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function requestBook(bookId) {
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+            fetchAPI('requests.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ book_id: bookId })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(lang === 'ar' ? 'تم تقديم طلب الاستعارة بنجاح!' : 'Borrow request submitted successfully!');
+                        loadBooks();
+
+                        const userStr = localStorage.getItem('user');
+                        if (userStr) {
+                            const user = JSON.parse(userStr);
+                            user.current_borrow_count = parseInt(user.current_borrow_count || 0) + 1;
+                            localStorage.setItem('user', JSON.stringify(user));
+                            updateStatsUI(user);
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(err => alert(err));
+        }
+
+        function joinWaitlist(bookId) {
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+            fetchAPI('waitlist.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ book_id: bookId })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                });
+        }
+
+        function handleStudentSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('txtFormBookName').value.trim();
+            const author = document.getElementById('txtFormAuthor').value.trim();
+            const department = document.getElementById('txtFormDept').value;
+            const message = document.getElementById('txtFormMsg').value.trim();
+
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+
+            fetchAPI('books.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, author, department })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(lang === 'ar' ? 'تمت إضافة الكتاب بنجاح ونشره للجميع!' : 'Book shared successfully and listed in the library!');
+                        document.getElementById('frmShareBook').reset();
+                        switchStudentSection('explore');
+                        loadBooks();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function loadStudentRequests() {
+            const tbody = document.getElementById('tblStudentRequestsBody');
+            tbody.innerHTML = '';
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+
+            fetchAPI('requests.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.requests) {
+                        if (data.requests.length === 0) {
+                            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">${lang === 'ar' ? 'ليس لديك طلبات نشطة حالياً.' : 'You have no active requests.'}</td></tr>`;
+                            return;
+                        }
+                        data.requests.forEach(req => {
+                            let statusBadge = '';
+                            if (req.status === 'Pending') {
+                                statusBadge = `<span class="badge bg-warning text-dark">${lang === 'ar' ? 'معلق' : 'Pending'}</span>`;
+                            } else if (req.status === 'Approved') {
+                                statusBadge = `<span class="badge bg-success">${lang === 'ar' ? 'مقبول' : 'Approved'}</span>`;
+                            } else if (req.status === 'Rejected') {
+                                statusBadge = `<span class="badge bg-danger">${lang === 'ar' ? 'مرفوض' : 'Rejected'}</span>`;
+                                if (req.rejection_reason) {
+                                    statusBadge += `<div class="text-danger mt-1 small" style="font-size: 0.75rem; max-width: 150px; word-wrap: break-word;">${lang === 'ar' ? 'السبب' : 'Reason'}: ${req.rejection_reason}</div>`;
+                                }
+                            } else if (req.status === 'Returned') {
+                                statusBadge = `<span class="badge bg-info text-dark">${lang === 'ar' ? 'تم الإرجاع' : 'Returned'}</span>`;
+                            }
+
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td><strong>${req.book_title}</strong><br><small class="text-muted">${req.author}</small></td>
+                                    <td>${new Date(req.request_date).toLocaleDateString()}</td>
+                                    <td>${req.return_deadline ? new Date(req.return_deadline).toLocaleDateString() : '-'}</td>
+                                    <td>${statusBadge}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                });
+        }
+
+        function loadStudentNotifications() {
+            const container = document.getElementById('divStudentNotifications');
+            container.innerHTML = '';
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+
+            fetchAPI('notifications.php')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.notifications) {
+                        if (data.notifications.length === 0) {
+                            container.innerHTML = `<p class="text-center text-muted my-3">${lang === 'ar' ? 'لا توجد إشعارات.' : 'No notifications.'}</p>`;
+                            return;
+                        }
+
+                        let unreadExists = false;
+
+                        data.notifications.forEach(notif => {
+                            const isUnread = !notif.is_read;
+                            if (isUnread) unreadExists = true;
+
+                            container.innerHTML += `
+                                <div class="p-3 mb-2 rounded border ${isUnread ? 'bg-light border-warning' : 'bg-white'}" style="font-size:0.9rem;">
+                                    <div>${notif.message}</div>
+                                    <small class="text-muted d-block mt-1">${new Date(notif.sent_at).toLocaleString()}</small>
+                                </div>
+                            `;
+                        });
+
+                        if (unreadExists) {
+                            fetchAPI('notifications.php', { method: 'PUT' });
+                        }
+                    }
+                });
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            fetchAPI('logout.php')
+                .then(() => {
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                });
+        }
+
+
+        function toggleSearchZone(event) {
+            event.stopPropagation();
+            const wrapper = document.getElementById('searchWrapper');
+            const input = document.getElementById('txtSearchBook');
+
+            wrapper.classList.add('active-search');
+            input.focus();
+        }
+
+        document.addEventListener('click', function (e) {
+            const wrapper = document.getElementById('searchWrapper');
+            const input = document.getElementById('txtSearchBook');
+            if (wrapper && !wrapper.contains(e.target) && input.value.trim() === '') {
+                wrapper.classList.remove('active-search');
+            }
+        });
+
+        function triggerIconJump(cardEl) {
+            const placeholder = cardEl.querySelector('.book-cover-placeholder');
+            if (placeholder) {
+                placeholder.classList.add('icon-jump');
+                setTimeout(() => placeholder.classList.remove('icon-jump'), 400);
+            }
+        }
+
+        function switchStudentSection(target) {
+            currentStudentSection = target;
+            localStorage.setItem('currentStudentSection', target);
+            const lang = document.documentElement.getAttribute('lang') || 'en';
+
+            document.getElementById('sectionExplore').classList.add('d-none');
+            document.getElementById('sectionShare').classList.add('d-none');
+            document.getElementById('sectionRequests').classList.add('d-none');
+
+            document.getElementById('lnkExplore').classList.remove('active');
+            document.getElementById('lnkShare').classList.remove('active');
+            document.getElementById('lnkRequests').classList.remove('active');
+
+            if (target === 'explore') {
+                document.getElementById('sectionExplore').classList.remove('d-none');
+                document.getElementById('lnkExplore').classList.add('active');
+                document.getElementById('lblExploreTitle').innerText = studentTranslations[lang].explore.title;
+                document.getElementById('lblExploreSub').innerText = studentTranslations[lang].explore.sub;
+            } else if (target === 'share') {
+                document.getElementById('sectionShare').classList.remove('d-none');
+                document.getElementById('lnkShare').classList.add('active');
+                document.getElementById('lblShareTitle').innerText = studentTranslations[lang].share.title;
+                document.getElementById('lblShareSub').innerText = studentTranslations[lang].share.sub;
+            } else if (target === 'requests') {
+                document.getElementById('sectionRequests').classList.remove('d-none');
+                document.getElementById('lnkRequests').classList.add('active');
+                document.getElementById('lblExploreTitle').innerText = studentTranslations[lang].requests.title;
+                document.getElementById('lblExploreSub').innerText = studentTranslations[lang].requests.sub;
+                loadStudentRequests();
+                loadStudentNotifications();
+                updateNotifBadge();
+            }
+        }
+
+        function toggleStudentLanguage() {
+            const htmlTag = document.documentElement;
+            const contentZone = document.getElementById('studentMainContent');
+            const langBtn = document.getElementById('studentLangBtn');
+
+            contentZone.style.opacity = '0';
+
+            setTimeout(() => {
+                const isEn = htmlTag.getAttribute('lang') === 'en';
+                const nextLang = isEn ? 'ar' : 'en';
+
+                htmlTag.setAttribute('lang', nextLang);
+                htmlTag.setAttribute('dir', isEn ? 'rtl' : 'ltr');
+                langBtn.innerText = isEn ? 'English' : 'العربية';
+
+                document.getElementById('txtSearchBook').placeholder = isEn ? 'بحث عن كتاب...' : 'Search book...';
+
+                updateStudentStaticTexts(nextLang);
+                renderDepartmentFilters();
+                displayRandomQuote(nextLang);
+                switchStudentSection(currentStudentSection);
+
+                const userStr = localStorage.getItem('user');
+                if (userStr) {
+                    updateStatsUI(JSON.parse(userStr));
+                }
+
+                contentZone.style.opacity = '1';
+            }, 400);
+        }
+
+        function updateStudentStaticTexts(lang) {
+            const dictionary = {
+                ar: {
+                    lblNavExplore: 'تصفح الكتب', lblNavShare: 'شارك كتاباً', lblNavRequests: 'طلباتي والإشعارات',
+                    lblFormBookName: 'عنوان الكتاب', lblFormAuthor: 'المؤلف/الكاتب',
+                    lblFormDept: 'القسم الهندسي المختص', lblFormMsg: 'رسالة وتفاصيل موجهة للنادي (حالة الكتاب، ملاحظات)',
+                    btnFormSubmit: 'إرسال البيانات للنادي',
+                    lblRequestsTitle: 'سجل طلبات الاستعارة الخاصة بي',
+                    lblNotificationsTitle: 'تنبيهات النظام والإشعارات'
+                },
+                en: {
+                    lblNavExplore: 'Explore Books', lblNavShare: 'Share a Book', lblNavRequests: 'My Requests',
+                    lblFormBookName: 'Book Title', lblFormAuthor: 'Author',
+                    lblFormDept: 'Engineering Department', lblFormMsg: 'Message to the Club (Condition, Notes)',
+                    btnFormSubmit: 'Send to Club',
+                    lblRequestsTitle: 'My Borrowing Requests',
+                    lblNotificationsTitle: 'Notifications'
+                }
+            };
+
+            for (let id in dictionary[lang]) {
+                const el = document.getElementById(id);
+                if (el) el.innerText = dictionary[lang][id];
+            }
+        }
+    </script>
+</body>
+
+</html>
